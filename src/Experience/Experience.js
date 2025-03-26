@@ -7,6 +7,7 @@ import World from './World/World'
 import Resources from './Utils/Resources'
 import sources from './sources.js'
 import Debug from './Utils/Debug.js'
+import GradientTexture from './Utils/GradientTexture.js'
 
 let instance = null
 
@@ -32,6 +33,8 @@ export default class Experience
         this.sizes = new Sizes()
         this.time = new Time()
         this.scene = new THREE.Scene()
+        this.backgroundTexture = new GradientTexture('#ff0000', '#0000ff')
+        this.scene.background = this.backgroundTexture.gradientTexture
         this.resources = new Resources(sources)
         this.camera = new Camera()
         this.renderer = new Renderer()
