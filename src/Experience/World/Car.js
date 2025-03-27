@@ -27,7 +27,7 @@ export default class Car
     {
         this.model = this.resource.scene
         this.model.scale.setScalar(1.0)
-        this.model.position.y = 0.7
+        this.model.position.y = -7
         this.scene.add(this.model)
 
         this.model.traverse((child) => {
@@ -41,7 +41,7 @@ export default class Car
         {
             this.debugFolder.add(this.model.position, 'y')
                             .name('Car Position Y')
-                            .min(0)
+                            .min(-10)
                             .max(10)
                             .step(0.01)
         }

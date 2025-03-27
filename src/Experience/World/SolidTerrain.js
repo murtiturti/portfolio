@@ -13,16 +13,17 @@ export default class SolidTerrain extends Terrain
     setMaterial()
     {
         const mainTerrain = this.experience.world.terrain
-    this.uniforms.uBigHillElevation = mainTerrain.uniforms.uBigHillElevation
-    this.uniforms.uBigHillFrequency = mainTerrain.uniforms.uBigHillFrequency
+        this.uniforms.uBigHillElevation = mainTerrain.uniforms.uBigHillElevation
+        this.uniforms.uBigHillFrequency = mainTerrain.uniforms.uBigHillFrequency
+        this.uniforms.uRoadElevation = mainTerrain.uniforms.uRoadElevation
 
-    // Create the solid terrain material with shared uniforms
-    this.material = new THREE.ShaderMaterial({
-        wireframe: false,
-        vertexShader: terrainVertexShader,
-        fragmentShader: terrainFragmentShader,
-        uniforms: this.uniforms
-    })
+        // Create the solid terrain material with shared uniforms
+        this.material = new THREE.ShaderMaterial({
+            wireframe: false,
+            vertexShader: terrainVertexShader,
+            fragmentShader: terrainFragmentShader,
+            uniforms: this.uniforms
+        })
     
         // Customize color
         this.material.uniforms.uColor.value = new THREE.Color('#2e2e2d')
@@ -32,6 +33,6 @@ export default class SolidTerrain extends Terrain
     {
         super.setMesh()
 
-        this.mesh.position.y -= 0.01
+        this.mesh.position.y -= 0.05
     }
 }

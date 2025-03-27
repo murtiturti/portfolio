@@ -15,7 +15,9 @@ export default class Terrain
         {
             uBigHillElevation: new THREE.Uniform(10),
             uBigHillFrequency: new THREE.Uniform(new THREE.Vector2(0.145, 0.084)),
-            uColor: new THREE.Uniform(new THREE.Color('#00ff00'))
+            uColor: new THREE.Uniform(new THREE.Color('#00ff00')),
+            uTime: new THREE.Uniform(0),
+            uRoadElevation: new THREE.Uniform(-8)
         }
 
         if (this.debug.active)
@@ -66,6 +68,11 @@ export default class Terrain
                 .min(0)
                 .max(5)
                 .step(0.001)
+            this.debugFolder.add(this.material.uniforms.uRoadElevation, 'value')
+                .name('Road Elevation')
+                .min(-10)
+                .max(0)
+                .step(0.01)
         }
     }
 
@@ -74,5 +81,10 @@ export default class Terrain
         this.mesh = new THREE.Mesh(this.geometry, this.material)
         this.mesh.rotation.x = - Math.PI * 0.5
         this.scene.add(this.mesh)
+    }
+
+    update()
+    {
+        this.material.uniforms.uTime.value += this.experience.time.delta * 0.0005
     }
 }

@@ -36,5 +36,14 @@ export default class World
         {
             this.fox.update()
         }
+        if (this.terrain && this.solidTerrain)
+        {
+            this.terrain.update()
+            this.solidTerrain.update()
+        }
+        if (this.sun)
+        {
+            this.sun.update()
+        }
     }
 }

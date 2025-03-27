@@ -1,5 +1,7 @@
-uniform float uBigHillElevation;
 uniform vec2 uBigHillFrequency;
+uniform float uBigHillElevation;
+uniform float uTime;
+uniform float uRoadElevation;
 
 #include ../includes/cnoise
 
@@ -9,10 +11,11 @@ void main()
 
     // Elevation
     //float elevation = sin(modelPosition.z * uBigHillFrequency.y) * sin(modelPosition.x * uBigHillFrequency.x) * uBigHillElevation;
-    float elevation = cnoise(vec3(modelPosition.xz * uBigHillFrequency, 0.0)) * uBigHillElevation;
+    float elevation = cnoise(vec3(modelPosition.xz * uBigHillFrequency, uTime)) * uBigHillElevation;
 
-    float fade = smoothstep(0.0, 15.0, abs(modelPosition.x));
+    float fade = smoothstep(0.0, 20.0, abs(modelPosition.x));
     elevation *= fade;
+    elevation -= (1.0 - fade) * -uRoadElevation;
 
     modelPosition.y += elevation;
 

@@ -1,5 +1,7 @@
 import * as THREE from 'three'
 import Experience from '../experience'
+import sunVertexShader from '../../shaders/sun/vertex.glsl'
+import sunFragmentShader from '../../shaders/sun/fragment.glsl'
 
 export default class Sun
 {
@@ -24,7 +26,7 @@ export default class Sun
 
     setGeometry()
     {
-        this.geometry = new THREE.SphereGeometry(15, 32, 32)
+        this.geometry = new THREE.SphereGeometry(10, 32, 32)
     }
 
     setTextures()
@@ -34,17 +36,28 @@ export default class Sun
 
     setMaterial()
     {
-        this.material = new THREE.MeshBasicMaterial({
-            color: '#f58505'
+        this.material = new THREE.ShaderMaterial({
+            vertexShader: sunVertexShader,
+            fragmentShader: sunFragmentShader,
+            uniforms:
+            {
+                uColor: new THREE.Uniform(new THREE.Color('#f58505')),
+                uTime: new THREE.Uniform(0)
+            }
         })
     }
 
     setMesh()
     {
         this.mesh = new THREE.Mesh(this.geometry, this.material)
-        this.mesh.position.set(0.2, 8, -108)
+        this.mesh.position.set(0.2, 8, -65)
         this.mesh.receiveShadow = false
         this.scene.add(this.mesh)
+    }
+
+    update()
+    {
+        this.material.uniforms.uTime.value += this.experience.time.delta
     }
 
 
