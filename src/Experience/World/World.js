@@ -5,6 +5,7 @@ import Terrain from "./Terrain";
 import Fox from './Fox';
 import Car from './Car'
 import Sun from "./Sun";
+import SolidTerrain from "./SolidTerrain";
 
 export default class World
 {
@@ -19,6 +20,7 @@ export default class World
             // Setup
             //this.floor = new Floor()
             this.terrain = new Terrain()
+            this.solidTerrain = new SolidTerrain()
             //this.fox = new Fox()
             this.car = new Car()
             this.sun = new Sun()
