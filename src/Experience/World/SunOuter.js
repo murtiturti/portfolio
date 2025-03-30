@@ -1,10 +1,9 @@
 import * as THREE from 'three'
 import Experience from '../experience'
-import sunVertexShader from '../../shaders/sun/vertex.glsl'
-import sunFragmentShader from '../../shaders/sun/fragment.glsl'
-import GradientTexture from '../Utils/GradientTexture'
+import sunVertexShader from '../../shaders/sunOuter/vertex.glsl'
+import sunFragmentShader from '../../shaders/sunOuter/fragment.glsl'
 
-export default class Sun
+export default class SunOuter
 {
     constructor()
     {
@@ -13,11 +12,6 @@ export default class Sun
         this.resources = this.experience.resources
         // this.time = this.experience.time
         this.debug = this.experience.debug
-
-        if (this.debug.active)
-        {
-            this.debugFolder = this.debug.ui.addFolder('Sun')
-        }
 
         this.setGeometry()
         this.setTextures()
@@ -36,18 +30,15 @@ export default class Sun
     }
 
     setMaterial()
-    {
+    {   
         this.material = new THREE.ShaderMaterial({
+            side: THREE.BackSide,
+            transparent: true,
             vertexShader: sunVertexShader,
             fragmentShader: sunFragmentShader,
-            transparent: true,
-            depthWrite: false,
             uniforms:
             {
-                uTime: new THREE.Uniform(0),
-                uNumBands: new THREE.Uniform(12),
-                uTopColor: new THREE.Uniform(new THREE.Color('#f74205')),
-                uBottomColor: new THREE.Uniform(new THREE.Color('#ff1803'))
+                uAtmosphereDayColor: new THREE.Uniform(new THREE.Color('#f74205'))
             }
         })
     }
@@ -55,6 +46,7 @@ export default class Sun
     setMesh()
     {
         this.mesh = new THREE.Mesh(this.geometry, this.material)
+        this.mesh.scale.setScalar(1.017);
         this.mesh.position.set(0.2, 5, -65)
         this.mesh.rotation.set(Math.PI, 0, 0)
         this.mesh.receiveShadow = false
@@ -64,7 +56,6 @@ export default class Sun
     update()
     {
         this.material.uniforms.uTime.value += this.experience.time.delta
-        this.mesh.rotation.y += this.experience.time.delta / 5000;
     }
 
 

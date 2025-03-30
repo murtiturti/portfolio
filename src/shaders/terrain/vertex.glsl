@@ -10,7 +10,6 @@ void main()
     vec4 modelPosition = modelMatrix * vec4(position, 1.0);
 
     // Elevation
-    //float elevation = sin(modelPosition.z * uBigHillFrequency.y) * sin(modelPosition.x * uBigHillFrequency.x) * uBigHillElevation;
     float elevation = cnoise(vec3(modelPosition.xz * uBigHillFrequency, uTime)) * uBigHillElevation;
 
     float fade = smoothstep(0.0, 20.0, abs(modelPosition.x));

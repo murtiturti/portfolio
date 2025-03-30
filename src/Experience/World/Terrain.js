@@ -17,7 +17,8 @@ export default class Terrain
             uBigHillFrequency: new THREE.Uniform(new THREE.Vector2(0.145, 0.084)),
             uColor: new THREE.Uniform(new THREE.Color('#00ff00')),
             uTime: new THREE.Uniform(0),
-            uRoadElevation: new THREE.Uniform(-8)
+            uRoadElevation: new THREE.Uniform(-8),
+            uCarRotation: new THREE.Uniform(this.experience.world.car)
         }
 
         if (this.debug.active)
