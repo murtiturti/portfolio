@@ -55,6 +55,19 @@ export default class Car
 
     update()
     {
-        this.model.rotation.y = Math.sin(this.experience.time.elapsed * 0.0005) * Math.PI / 6
+        //this.model.rotation.y = Math.sin(this.experience.time.elapsed * 0.0005) * Math.PI / 6
+        const scaledTime = this.experience.time.elapsed * 0.0005
+
+        
+        // Calculate derivative at point 0.5 (center of terrain uv)
+        const v = 0.5
+        const rotationSampleDelta = 0.001 
+        // const derivative = 3 * Math.cos(0.3 * v + scaledTime * rotationSampleRate) + 0.3 * Math.sin(0.1 * v + scaledTime * rotationSampleRate) + Math.cos(0.1 * v + scaledTime* rotationSampleRate) * 0.1 * Math.sin(0.3 * v + scaledTime* rotationSampleRate)
+        // const theta = Math.atan(derivative)
+        const rotationSample0 = (Math.sin(0.3 * 0.5 + scaledTime) * Math.sin(0.1 * 0.5 + scaledTime)) * 3.0
+        const rotationSample1 = (Math.sin(0.3 * 0.5 + scaledTime + rotationSampleDelta) * Math.sin(0.1 * 0.5 + scaledTime + rotationSampleDelta)) * 3.0
+        const theta = Math.atan2(rotationSample1 - rotationSample0, rotationSampleDelta)
+        this.model.rotation.y = theta * 0.1
+        this.model.position.x = 0 - (Math.sin(0.3 * 0.5 + scaledTime * 1.0) * Math.sin(0.1 * 0.5 + scaledTime * 1.0)) * 3.0
     }
 }

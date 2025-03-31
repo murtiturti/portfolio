@@ -15,11 +15,14 @@ void main()
     // Elevation
     float elevation = cnoise(vec3(modelPosition.xz * uBigHillFrequency, uTime)) * uBigHillElevation;
 
+    // Curve
+    float xOffset = sin(0.3 * uv.y + uTime) * sin(0.1 * uv.y + uTime) * 3.0;
+
     float diff = uv.y - 0.5;
     diff = clamp(diff, 0.0, 0.5) / 0.5;
     float side = uCarYRotation / 30.0;
 
-    float fade = smoothstep(0.0, uValleyDepth + abs(sin(uTime)) * 8.0, abs(modelPosition.x - diff * side * 10.0));
+    float fade = smoothstep(0.0, uValleyDepth + abs(sin(uTime)) * 8.0, abs(modelPosition.x + xOffset));
     elevation *= fade;
     elevation -= (1.0 - fade) * -uRoadElevation;
 
