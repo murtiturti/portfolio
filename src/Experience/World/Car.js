@@ -52,4 +52,9 @@ export default class Car
         this.animation = {} // No anim
     }
 
+
+    update()
+    {
+        this.model.rotation.y = Math.sin(this.experience.time.elapsed * 0.0005) * Math.PI / 6
+    }
 }

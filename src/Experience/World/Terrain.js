@@ -18,7 +18,8 @@ export default class Terrain
             uColor: new THREE.Uniform(new THREE.Color('#00ff00')),
             uTime: new THREE.Uniform(0),
             uRoadElevation: new THREE.Uniform(-8),
-            uCarRotation: new THREE.Uniform(this.experience.world.car)
+            uValleyDepth: new THREE.Uniform(14),
+            uCarYRotation: new THREE.Uniform(0)
         }
 
         if (this.debug.active)
@@ -87,5 +88,6 @@ export default class Terrain
     update()
     {
         this.material.uniforms.uTime.value += this.experience.time.delta * 0.0005
+        this.material.uniforms.uCarYRotation.value = -this.experience.world.car.model.rotation.y * (180 / Math.PI)
     }
 }

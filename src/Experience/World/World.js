@@ -47,5 +47,9 @@ export default class World
         {
             this.sun.update()
         }
+        if (this.car)
+        {
+            this.car.update()
+        }
     }
 }

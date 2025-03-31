@@ -23,6 +23,24 @@ export default class Sun
         this.setTextures()
         this.setMaterial()
         this.setMesh()
+
+        if (this.debug.active)
+        {
+            const debugObject = {
+                topColor: '#' + this.material.uniforms.uTopColor.value.getHexString(),
+                bottomColor: '#' + this.material.uniforms.uBottomColor.value.getHexString()
+            }
+            this.debugFolder.addColor(debugObject, 'topColor')
+                .name('Sun Top Color')
+                .onChange((value) => {
+                    this.material.uniforms.uTopColor.value.set(value)
+                })
+            this.debugFolder.addColor(debugObject, 'bottomColor')
+                .name('Sun Bottom Color')
+                .onChange((value) => {
+                    this.material.uniforms.uBottomColor.value.set(value)
+                })
+        }
     }
 
     setGeometry()
