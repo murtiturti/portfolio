@@ -31,5 +31,10 @@ export default [
         name: 'carModel',
         type: 'gltfModel',
         path: './models/Car/cybercar.glb'
+    },
+    {
+        name: 'backgroundTexture',
+        type: 'texture',
+        path: 'textures/city-background/background_city.png'
     }
 ]
