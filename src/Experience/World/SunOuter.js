@@ -21,7 +21,7 @@ export default class SunOuter
 
     setGeometry()
     {
-        this.geometry = new THREE.SphereGeometry(12, 32, 32)
+        this.geometry = new THREE.SphereGeometry(6, 32, 32)
     }
 
     setTextures()
@@ -47,7 +47,7 @@ export default class SunOuter
     {
         this.mesh = new THREE.Mesh(this.geometry, this.material)
         this.mesh.scale.setScalar(1.017);
-        this.mesh.position.set(0.2, 5, -65)
+        this.mesh.position.set(-1, -6, -65)
         this.mesh.rotation.set(Math.PI, 0, 0)
         this.mesh.receiveShadow = false
         this.scene.add(this.mesh)

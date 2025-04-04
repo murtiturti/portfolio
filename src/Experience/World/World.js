@@ -7,6 +7,7 @@ import Car from './Car'
 import Sun from "./Sun";
 import SolidTerrain from "./SolidTerrain";
 import SunOuter from "./SunOuter";
+import Background from "./Background.js";
 
 export default class World
 {
@@ -26,6 +27,7 @@ export default class World
             this.car = new Car()
             this.sun = new Sun()
             this.sunOuter = new SunOuter()
+            //this.backgroundPlane = new Background()
             this.environment = new Environment()
         })
 

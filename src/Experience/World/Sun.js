@@ -40,12 +40,17 @@ export default class Sun
                 .onChange((value) => {
                     this.material.uniforms.uBottomColor.value.set(value)
                 })
+
+            // Add debug controls for position
+            this.debugFolder.add(this.mesh.position, 'x').min(-100).max(100).step(0.01).name('Sun Position X')
+            this.debugFolder.add(this.mesh.position, 'y').min(-100).max(100).step(0.01).name('Sun Position Y')
+            this.debugFolder.add(this.mesh.position, 'z').min(-100).max(100).step(0.01).name('Sun Position Z')
         }
     }
 
     setGeometry()
     {
-        this.geometry = new THREE.SphereGeometry(12, 32, 32)
+        this.geometry = new THREE.SphereGeometry(6, 32, 32)
     }
 
     setTextures()
@@ -73,7 +78,7 @@ export default class Sun
     setMesh()
     {
         this.mesh = new THREE.Mesh(this.geometry, this.material)
-        this.mesh.position.set(0.2, 5, -65)
+        this.mesh.position.set(-1, -6, -65)
         this.mesh.rotation.set(Math.PI, 0, 0)
         this.mesh.receiveShadow = false
         this.scene.add(this.mesh)

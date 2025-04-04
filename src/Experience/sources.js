@@ -35,6 +35,6 @@ export default [
     {
         name: 'backgroundTexture',
         type: 'texture',
-        path: 'textures/city-background/background_city.png'
+        path: 'textures/city-background/blue_city.png'
     }
 ]
