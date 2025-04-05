@@ -9,6 +9,7 @@ import sources from './sources.js'
 import Debug from './Utils/Debug.js'
 import GradientTexture from './Utils/GradientTexture.js'
 import UserInput from './Utils/UserInput.js'
+import Timer from './Utils/Timer.js'
 
 let instance = null
 
@@ -46,6 +47,9 @@ export default class Experience
         this.totalHoldTime = 0
         this.currentHoldTime = 0
 
+        this.accelerationTimer = new Timer(3)
+        this.slowDownTimer = new Timer(2)
+
         // Sizes resize event
         this.sizes.on('resize', () =>
         {
@@ -59,14 +63,22 @@ export default class Experience
 
         this.userInput.on('mousedown', () => {
             this.moving = true
+            this.accelerationTimer.start()
         })
 
         this.userInput.on('mouseup', () => {
-            this.moving = false
+            // this.moving = false
+            this.slowDownTimer.start()
         })
 
         this.userInput.on('mouseheld', () => {
-            this.totalHoldTime += this.time.delta
+            this.totalHoldTime += this.time.delta * this.accelerationTimer.progress
+            
+        })
+
+        this.slowDownTimer.on('over', () =>
+        {
+            this.moving = false
         })
 
     }
@@ -82,6 +94,13 @@ export default class Experience
         this.camera.update()
         this.world.update()
         this.renderer.update()
+        this.accelerationTimer.update()
+        this.slowDownTimer.update()
+
+        // if (this.slowDownTimer.running)
+        // {
+        //     this.totalHoldTime += this.time.delta * (1 - this.slowDownTimer.progress)
+        // }
     }
 
     destroy()
@@ -90,6 +109,7 @@ export default class Experience
         this.time.off('tick')
         this.userInput.off('mousedown')
         this.userInput.off('mouseup')
+        this.userInput.off('mouseheld')
 
         // Traverse the whole scene
         this.scene.traverse((child) => 
