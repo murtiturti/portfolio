@@ -90,7 +90,7 @@ export default class Terrain
     {
         if (this.experience.moving)
         {
-            this.material.uniforms.uTime.value += this.experience.time.delta * 0.0005
+            this.material.uniforms.uTime.value = this.experience.totalHoldTime * 0.0005
         }
         // this.material.uniforms.uCarYRotation.value = -this.experience.world.car.model.rotation.y * (180 / Math.PI)
     }

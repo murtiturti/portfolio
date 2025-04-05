@@ -42,6 +42,10 @@ export default class Experience
         this.renderer = new Renderer()
         this.world = new World()
 
+        // Time-based Animation
+        this.totalHoldTime = 0
+        this.currentHoldTime = 0
+
         // Sizes resize event
         this.sizes.on('resize', () =>
         {
@@ -59,6 +63,10 @@ export default class Experience
 
         this.userInput.on('mouseup', () => {
             this.moving = false
+        })
+
+        this.userInput.on('mouseheld', () => {
+            this.totalHoldTime += this.time.delta
         })
 
     }

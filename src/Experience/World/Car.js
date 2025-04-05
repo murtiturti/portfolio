@@ -60,7 +60,7 @@ export default class Car
         if (this.experience.moving)
         {
             //this.model.rotation.y = Math.sin(this.experience.time.elapsed * 0.0005) * Math.PI / 6
-            this.totalMoveTime += this.experience.time.delta * 0.0005
+            this.totalMoveTime = this.experience.totalHoldTime * 0.0005
             
             // Calculate derivative at point 0.5 (center of terrain uv)
             const v = 0.5
