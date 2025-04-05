@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import Experience from '../experience'
 import terrainVertexShader from '../../shaders/terrain/vertex.glsl'
 import terrainFragmentShader from '../../shaders/terrain/fragment.glsl'
+import UserInput from '../Utils/UserInput.js'
 
 export default class Terrain 
 {
@@ -87,7 +88,10 @@ export default class Terrain
 
     update()
     {
-        this.material.uniforms.uTime.value += this.experience.time.delta * 0.0005
+        if (this.experience.moving)
+        {
+            this.material.uniforms.uTime.value += this.experience.time.delta * 0.0005
+        }
         // this.material.uniforms.uCarYRotation.value = -this.experience.world.car.model.rotation.y * (180 / Math.PI)
     }
 }

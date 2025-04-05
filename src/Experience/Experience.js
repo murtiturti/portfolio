@@ -8,6 +8,7 @@ import Resources from './Utils/Resources'
 import sources from './sources.js'
 import Debug from './Utils/Debug.js'
 import GradientTexture from './Utils/GradientTexture.js'
+import UserInput from './Utils/UserInput.js'
 
 let instance = null
 
@@ -32,6 +33,7 @@ export default class Experience
         this.debug = new Debug()
         this.sizes = new Sizes()
         this.time = new Time()
+        this.userInput = new UserInput()
         this.scene = new THREE.Scene()
         this.backgroundTexture = new GradientTexture('#ff0000', '#0000ff')
         this.scene.background = this.backgroundTexture.gradientTexture
@@ -50,6 +52,15 @@ export default class Experience
         this.time.on('tick', () => {
             this.update()
         })
+
+        this.userInput.on('mousedown', () => {
+            this.moving = true
+        })
+
+        this.userInput.on('mouseup', () => {
+            this.moving = false
+        })
+
     }
 
     resize() 
@@ -69,6 +80,8 @@ export default class Experience
     {
         this.sizes.off('resize')
         this.time.off('tick')
+        this.userInput.off('mousedown')
+        this.userInput.off('mouseup')
 
         // Traverse the whole scene
         this.scene.traverse((child) => 
