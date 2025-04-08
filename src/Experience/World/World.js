@@ -1,4 +1,4 @@
-import Experience from "../experience";
+import Experience from "../Experience.js";
 import Environment from './Environment';
 import Floor from './Floor';
 import Terrain from "./Terrain";

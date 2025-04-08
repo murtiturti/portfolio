@@ -63,22 +63,17 @@ export default class Experience
 
         this.userInput.on('mousedown', () => {
             this.moving = true
-            this.accelerationTimer.start()
-            this.slowDownTimer.reset()
+            // this.accelerationTimer.start()
+            // this.slowDownTimer.reset()
         })
 
         this.userInput.on('mouseup', () => {
-            // this.moving = false
-            this.slowDownTimer.start()
+            this.moving = false
+            // this.slowDownTimer.start()
         })
 
         this.userInput.on('mouseheld', () => {
-            this.totalHoldTime += this.time.delta * this.accelerationTimer.progress
-        })
-
-        this.slowDownTimer.on('over', () =>
-        {
-            this.moving = false
+            this.totalHoldTime += this.time.delta
         })
 
     }
@@ -94,13 +89,6 @@ export default class Experience
         this.camera.update()
         this.world.update()
         this.renderer.update()
-        this.accelerationTimer.update()
-        this.slowDownTimer.update()
-
-        if (this.slowDownTimer.running)
-        {
-            this.totalHoldTime += this.time.delta * (1 - this.slowDownTimer.progress)
-        }
     }
 
     destroy()

@@ -1,8 +1,7 @@
 import * as THREE from 'three'
-import Experience from '../experience'
+import Experience from '../Experience.js'
 import terrainVertexShader from '../../shaders/terrain/vertex.glsl'
 import terrainFragmentShader from '../../shaders/terrain/fragment.glsl'
-import UserInput from '../Utils/UserInput.js'
 
 export default class Terrain 
 {
@@ -20,8 +19,13 @@ export default class Terrain
             uTime: new THREE.Uniform(0),
             uRoadElevation: new THREE.Uniform(-8),
             uValleyDepth: new THREE.Uniform(14),
-            uCarYRotation: new THREE.Uniform(0)
+            uCarYRotation: new THREE.Uniform(0),
         }
+
+        this.maxSpeed = 10
+        this.currentSpeed = 0
+        this.acceleration = 0.05
+        this.deceleration = -0.05
 
         if (this.debug.active)
         {
@@ -90,8 +94,15 @@ export default class Terrain
     {
         if (this.experience.moving)
         {
-            this.material.uniforms.uTime.value = this.experience.totalHoldTime * 0.0005
+            this.currentSpeed += this.acceleration
+            
         }
+        else
+        {
+            this.currentSpeed += this.deceleration
+        }
+        this.currentSpeed = Math.min(Math.max(this.currentSpeed, 0), this.maxSpeed)
+        this.material.uniforms.uTime.value = this.experience.totalHoldTime * 0.0005 + Math.min(this.currentSpeed, this.maxSpeed)
         // this.material.uniforms.uCarYRotation.value = -this.experience.world.car.model.rotation.y * (180 / Math.PI)
     }
 }
