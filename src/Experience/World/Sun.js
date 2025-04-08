@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import Experience from '../experience'
+import Experience from '../Experience'
 import sunVertexShader from '../../shaders/sun/vertex.glsl'
 import sunFragmentShader from '../../shaders/sun/fragment.glsl'
 import GradientTexture from '../Utils/GradientTexture'
