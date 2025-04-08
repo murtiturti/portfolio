@@ -64,6 +64,7 @@ export default class Experience
         this.userInput.on('mousedown', () => {
             this.moving = true
             this.accelerationTimer.start()
+            this.slowDownTimer.reset()
         })
 
         this.userInput.on('mouseup', () => {
@@ -73,7 +74,6 @@ export default class Experience
 
         this.userInput.on('mouseheld', () => {
             this.totalHoldTime += this.time.delta * this.accelerationTimer.progress
-            
         })
 
         this.slowDownTimer.on('over', () =>
@@ -97,10 +97,10 @@ export default class Experience
         this.accelerationTimer.update()
         this.slowDownTimer.update()
 
-        // if (this.slowDownTimer.running)
-        // {
-        //     this.totalHoldTime += this.time.delta * (1 - this.slowDownTimer.progress)
-        // }
+        if (this.slowDownTimer.running)
+        {
+            this.totalHoldTime += this.time.delta * (1 - this.slowDownTimer.progress)
+        }
     }
 
     destroy()
