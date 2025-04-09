@@ -57,11 +57,12 @@ export default class Car
 
     update()
     {
-        if (this.experience.moving)
-        {
+        // if (this.experience.moving)
+        // {
             //this.model.rotation.y = Math.sin(this.experience.time.elapsed * 0.0005) * Math.PI / 6
-            this.totalMoveTime = this.experience.totalHoldTime * 0.0005
-            
+            // this.totalMoveTime = this.experience.totalHoldTime * 0.0005
+            this.totalMoveTime = this.experience.world.terrain.distance
+
             // Calculate derivative at point 0.5 (center of terrain uv)
             const v = 0.5
             const rotationSampleDelta = 0.001 
@@ -71,6 +72,6 @@ export default class Car
             const theta = Math.atan2(rotationSample1 - rotationSample0, rotationSampleDelta)
             this.model.rotation.y = theta * 0.1
             this.model.position.x = 0 - (Math.sin(0.3 * 0.5 + this.totalMoveTime * 1.0) * Math.sin(0.1 * 0.5 + this.totalMoveTime * 1.0)) * 3.0
-        }
+        // }
     }
 }

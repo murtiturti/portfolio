@@ -11,6 +11,7 @@ export default class Terrain
         this.scene = this.experience.scene
         this.resources = this.experience.resources
         this.debug = this.experience.debug
+        this.time = this.experience.time
         this.uniforms = 
         {
             uBigHillElevation: new THREE.Uniform(10),
@@ -20,11 +21,13 @@ export default class Terrain
             uRoadElevation: new THREE.Uniform(-8),
             uValleyDepth: new THREE.Uniform(14),
             uCarYRotation: new THREE.Uniform(0),
+            uDistance: new THREE.Uniform(0)
         }
 
+        this.distance = 0
         this.maxSpeed = 10
         this.currentSpeed = 0
-        this.acceleration = 0.05
+        this.acceleration = 0.0075
         this.deceleration = -0.05
 
         if (this.debug.active)
@@ -95,14 +98,16 @@ export default class Terrain
         if (this.experience.moving)
         {
             this.currentSpeed += this.acceleration
-            
         }
         else
         {
             this.currentSpeed += this.deceleration
         }
+        
         this.currentSpeed = Math.min(Math.max(this.currentSpeed, 0), this.maxSpeed)
-        this.material.uniforms.uTime.value = this.experience.totalHoldTime * 0.0005 + Math.min(this.currentSpeed, this.maxSpeed)
+        this.distance += this.currentSpeed * this.time.delta * 0.0001
+        this.material.uniforms.uTime.value = this.distance
+        // this.material.uniforms.uTime.value = this.experience.totalHoldTime * 0.0005 * Math.min(this.currentSpeed, this.maxSpeed)
         // this.material.uniforms.uCarYRotation.value = -this.experience.world.car.model.rotation.y * (180 / Math.PI)
     }
 }

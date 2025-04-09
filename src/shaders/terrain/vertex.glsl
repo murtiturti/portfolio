@@ -4,6 +4,7 @@ uniform float uRoadElevation;
 uniform float uValleyDepth;
 uniform vec2 uBigHillFrequency;
 uniform float uCarYRotation;
+uniform float uDistance;
 
 
 #include ../includes/cnoise
