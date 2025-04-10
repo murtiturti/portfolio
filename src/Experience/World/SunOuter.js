@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import Experience from '../experience'
+import Experience from '../Experience.js'
 import sunVertexShader from '../../shaders/sunOuter/vertex.glsl'
 import sunFragmentShader from '../../shaders/sunOuter/fragment.glsl'
 
@@ -46,7 +46,7 @@ export default class SunOuter
     setMesh()
     {
         this.mesh = new THREE.Mesh(this.geometry, this.material)
-        this.mesh.scale.setScalar(1.017);
+        this.mesh.scale.setScalar(1.07);
         this.mesh.position.set(-1, -6, -65)
         this.mesh.rotation.set(Math.PI, 0, 0)
         this.mesh.receiveShadow = false
