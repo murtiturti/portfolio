@@ -37,9 +37,10 @@ export default class World
             this.particlesLeft = new ParticleEmitter(
                 {
                     particles: this.particles, 
-                    position: this.car.model.position,
-                    time: this.time
+                    position: new THREE.Vector3(0, -7, 0),
+                    time: this.experience.time
                 })
+            console.log(window.experience.renderer.instance.getPixelRatio())
 
             this.scene.add(this.particlesLeft.points)
         })
@@ -63,6 +64,10 @@ export default class World
         if (this.car)
         {
             this.car.update()
+        }
+        if (this.particlesLeft)
+        {
+            this.particlesLeft.update()
         }
 
     }

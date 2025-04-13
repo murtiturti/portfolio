@@ -5,7 +5,7 @@ float uOutlineThickness = 0.075;  // e.g. 0.05
 vec4 uOutlineColor = vec4(0.0, 0.8, 0.1, 1.0);       // e.g. vec4(0.0, 0.0, 0.0, 1.0) for black outline
 
 // Hardcoded fill color (or you could pass it as a uniform)
-vec4 uFillColor = vec4(0.4, 0.4, 0.4, 1.0);
+vec4 uFillColor = vec4(vec3(0.05), 1.0);
 
 // Edge distance helper function
 float edgeDistance(vec2 p, vec2 a, vec2 b) {
@@ -40,4 +40,7 @@ void main() {
   vec4 color = mix(uFillColor, uOutlineColor, outlineFactor);
   
   gl_FragColor = color;
+
+  #include <colorspace_fragment>
+  #include <tonemapping_fragment>
 }

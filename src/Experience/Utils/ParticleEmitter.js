@@ -47,9 +47,9 @@ export default class ParticleEmitter
         // Set the particle's velocity
         const velocity = this.direction.multiplyScalar(this.speed)
 
-        this.geometry.attributes.aVelocity.array[posIndex] = this.velocity.x
-        this.geometry.attributes.aVelocity.array[posIndex + 1] = this.velocity.y
-        this.geometry.attributes.aVelocity.array[posIndex + 2] = this.velocity.z
+        this.geometry.attributes.aVelocity.array[posIndex] = velocity.x
+        this.geometry.attributes.aVelocity.array[posIndex + 1] = velocity.y
+        this.geometry.attributes.aVelocity.array[posIndex + 2] = velocity.z
 
         this.currentParticleCount++
     }
@@ -58,7 +58,7 @@ export default class ParticleEmitter
     {
         const currentTime = this.time.elapsed / 1000
 
-        // this.particles.material.uniforms.uTime.value = currentTime
+        this.particles.material.uniforms.uTime.value = currentTime
 
         const emissionInterval = 1 / this.rate
         while (currentTime - this.lastEmissionTime > emissionInterval && this.currentParticleCount < this.maxParticleCount)

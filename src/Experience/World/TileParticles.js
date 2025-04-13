@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import Experience from '../Experience'
 import tileVertexShader from '../../shaders/tiles/vertex.glsl'
 import tileFragmentShader from '../../shaders/tiles/fragment.glsl'
 
@@ -6,6 +7,8 @@ export default class TileParticles
 {
     constructor(maxCount)
     {
+        this.experience = new Experience()
+
         this.maxCount = maxCount
 
         this.geometry = new THREE.BufferGeometry()
@@ -17,7 +20,13 @@ export default class TileParticles
                 depthWrite: false,
                 blending: THREE.NoBlending,
                 vertexShader: tileVertexShader,
-                fragmentShader: tileFragmentShader
+                fragmentShader: tileFragmentShader,
+                uniforms: 
+                {
+                    uTime: new THREE.Uniform(0),
+                    uParticleLifetime: new THREE.Uniform(2),
+                    uPointSize: new THREE.Uniform(20 * window.experience.renderer.instance.getPixelRatio())
+                }
             }
         )
     }
