@@ -8,6 +8,9 @@ import Sun from "./Sun";
 import SolidTerrain from "./SolidTerrain";
 import SunOuter from "./SunOuter";
 import Background from "./Background.js";
+import ParticleEmitter from "../Utils/ParticleEmitter.js";
+import TileParticles from "./TileParticles.js";
+import * as THREE from 'three'
 
 export default class World
 {
@@ -29,6 +32,16 @@ export default class World
             this.sunOuter = new SunOuter()
             //this.backgroundPlane = new Background()
             this.environment = new Environment()
+
+            this.particles = new TileParticles(20)
+            this.particlesLeft = new ParticleEmitter(
+                {
+                    particles: this.particles, 
+                    position: new THREE.Vector3(0, -7, 0),
+                    time: this.time
+                })
+
+            this.scene.add(this.particlesLeft.points)
         })
     }
 
@@ -51,5 +64,6 @@ export default class World
         {
             this.car.update()
         }
+
     }
 }

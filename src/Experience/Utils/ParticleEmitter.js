@@ -2,7 +2,7 @@ import * as THREE from 'three'
 
 export default class ParticleEmitter
 {
-    constructor(particles, position, time)
+    constructor({particles, position, time})
     {
         // Particle data
         this.geometry = particles.geometry
@@ -12,6 +12,8 @@ export default class ParticleEmitter
         // Particle anim data
         this.speed = 1
         this.direction = new THREE.Vector3(0, 0.2, 1)
+
+        this.particles = particles
 
         // Emitter
         this.position = position

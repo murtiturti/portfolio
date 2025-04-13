@@ -1,5 +1,4 @@
 import * as THREE from 'three'
-import Experience from '../Experience'
 import tileVertexShader from '../../shaders/tiles/vertex.glsl'
 import tileFragmentShader from '../../shaders/tiles/fragment.glsl'
 
@@ -9,7 +8,6 @@ export default class TileParticles
     {
         this.maxCount = maxCount
 
-        this.experience = new Experience()
         this.geometry = new THREE.BufferGeometry()
 
         this.setAttributes()
