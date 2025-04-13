@@ -37,7 +37,7 @@ export default class World
             this.particlesLeft = new ParticleEmitter(
                 {
                     particles: this.particles, 
-                    position: new THREE.Vector3(0, -7, 0),
+                    position: this.car.model.position,
                     time: this.time
                 })
 
