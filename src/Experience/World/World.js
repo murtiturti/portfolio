@@ -30,8 +30,6 @@ export default class World
             //this.backgroundPlane = new Background()
             this.environment = new Environment()
         })
-
-        
     }
 
     update() 
