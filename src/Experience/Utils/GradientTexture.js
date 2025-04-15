@@ -15,5 +15,6 @@ export default class GradientTexture
         this.context.fillRect(0, 0, window.innerWidth, window.innerHeight)
 
         this.gradientTexture = new THREE.CanvasTexture(this.canvas)
+        this.gradientTexture.colorSpace = THREE.SRGBColorSpace
     }
 }

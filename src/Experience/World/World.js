@@ -33,16 +33,9 @@ export default class World
             //this.backgroundPlane = new Background()
             this.environment = new Environment()
 
-            this.particles = new TileParticles(20)
-            this.particlesLeft = new ParticleEmitter(
-                {
-                    particles: this.particles, 
-                    position: new THREE.Vector3(0, -7, 0),
-                    time: this.experience.time
-                })
-            console.log(window.experience.renderer.instance.getPixelRatio())
-
-            this.scene.add(this.particlesLeft.points)
+            this.particlesRight = new TileParticles(20, 1)
+            this.particlesLeft = new TileParticles(20, -1)
+            // this.scene.add(this.particles)
         })
     }
 
@@ -65,8 +58,9 @@ export default class World
         {
             this.car.update()
         }
-        if (this.particlesLeft)
+        if (this.particlesRight && this.particlesLeft)
         {
+            this.particlesRight.update()
             this.particlesLeft.update()
         }
 

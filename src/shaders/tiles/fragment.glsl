@@ -1,11 +1,13 @@
 precision mediump float;
 
+varying vec2 vUv;
+
 // Uniforms for outline control
 float uOutlineThickness = 0.075;  // e.g. 0.05
 vec4 uOutlineColor = vec4(0.0, 0.8, 0.1, 1.0);       // e.g. vec4(0.0, 0.0, 0.0, 1.0) for black outline
 
 // Hardcoded fill color (or you could pass it as a uniform)
-vec4 uFillColor = vec4(vec3(0.05), 1.0);
+vec4 uFillColor = vec4(vec3(0.02), 1.0);
 
 // Edge distance helper function
 float edgeDistance(vec2 p, vec2 a, vec2 b) {
@@ -17,7 +19,7 @@ float edgeDistance(vec2 p, vec2 a, vec2 b) {
 
 void main() {
   // Invert y so that (0,0) is bottom-left
-  vec2 p = vec2(gl_PointCoord.x, 1.0 - gl_PointCoord.y);
+  vec2 p = vec2(vUv.x, vUv.y);
 
   // Calculate distances to each of the triangle's edges.
   float d1 = edgeDistance(p, vec2(0.0, 0.0), vec2(1.0, 0.0));
