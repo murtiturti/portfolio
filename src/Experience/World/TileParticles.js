@@ -66,17 +66,32 @@ export default class TileParticles {
         // If delta is in milliseconds, uncomment the following line:
         deltaTime *= 0.001;
 
-        this.elapsedTime += deltaTime;
+
+        // Only spawn new particles if current speed is at least half of max speed
+        const emit = this.experience.world.terrain.currentSpeed >= (this.experience.world.terrain.maxSpeed * 0.5)
+
+        if (emit)
+        {
+            this.elapsedTime += deltaTime
+        }
+
+        const carModel = this.experience.world.car.model
 
         for (let i = 0; i < this.maxCount; i++) {
             const particle = this.particles[i];
 
+            if (!emit && !particle.active)
+            {
+                particle.spawnTime += deltaTime
+            }
+
             // If the particle is inactive and its scheduled spawn time has arrived, activate it.
-            if (!particle.active && this.elapsedTime >= particle.spawnTime) {
+            if (!particle.active && this.elapsedTime >= particle.spawnTime) 
+            {
                 particle.active = true;
                 particle.life = 0;
                 // Reset position to spawn point.
-                const tirePosition = this.experience.world.car.model.position.x + (1.25 * this.right)
+                const tirePosition = carModel.position.x + (1.25 * this.right)
                 particle.position.set(tirePosition, -7.5, 3.1);
                 // Make it visible.
                 particle.scale.set(Math.random() * 0.5 + 0.1, Math.random() * 0.5 + 0.1, Math.random() * 0.5 + 0.1);
