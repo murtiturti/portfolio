@@ -14,12 +14,12 @@ export default class Terrain
         this.time = this.experience.time
         this.uniforms = 
         {
-            uBigHillElevation: new THREE.Uniform(10),
+            uBigHillElevation: new THREE.Uniform(8.45),
             uBigHillFrequency: new THREE.Uniform(new THREE.Vector2(0.145, 0.084)),
             uColor: new THREE.Uniform(new THREE.Color('#00ff00')),
             uTime: new THREE.Uniform(0),
             uRoadElevation: new THREE.Uniform(-8),
-            uValleyDepth: new THREE.Uniform(14),
+            uValleyDepth: new THREE.Uniform(27.8),
             uCarYRotation: new THREE.Uniform(0),
             uDistance: new THREE.Uniform(0)
         }

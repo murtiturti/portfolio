@@ -33,8 +33,8 @@ export default class World
             //this.backgroundPlane = new Background()
             this.environment = new Environment()
 
-            this.particlesRight = new TileParticles(20, 1)
-            this.particlesLeft = new TileParticles(20, -1)
+            this.particlesRight = new TileParticles(40, 1)
+            this.particlesLeft = new TileParticles(40, -1)
             // this.scene.add(this.particles)
         })
     }

@@ -9,9 +9,9 @@ export default class TileParticles {
         this.maxCount = maxCount;
 
         // Spawning and lifetime parameters:
-        this.spawnRate = 4;              // Number of particles to spawn per second.
+        this.spawnRate = 10;              // Number of particles to spawn per second.
         this.spawnInterval = 1 / this.spawnRate; // Time interval (seconds) between spawns.
-        this.lifetime = 5;                // Lifetime (in seconds) of each particle.
+        this.lifetime = 3;                // Lifetime (in seconds) of each particle.
         this.elapsedTime = 0;             // Global elapsed time tracker.
         this.right = right
 
@@ -37,10 +37,10 @@ export default class TileParticles {
             const particle = {
                 // Define the spawn position.
                 position: new THREE.Vector3(0, -7.2, 3.1),
-                rotation: new THREE.Euler(0, 0, 0),
+                rotation: new THREE.Euler(0, 0, 90),
                 // Start off hidden.
                 scale: new THREE.Vector3(0, 0, 0),
-                velocity: new THREE.Vector3((Math.random() - 0.5) * 0.5, 1.5, 6),
+                velocity: new THREE.Vector3((Math.random() - 0.5) * 3, 5 + Math.random() * 5, 10 + Math.random() * 3),
                 life: 0,           // Time (seconds) particle has been active.
                 active: false,     // Is the particle spawned/active?
                 spawnTime: spawnTime, // When to spawn this particle.
@@ -59,6 +59,7 @@ export default class TileParticles {
         this.instancedMesh.instanceMatrix.needsUpdate = true;
         this.experience.scene.add(this.instancedMesh);
     }
+
 
     update() {
         // Get delta time from Experience. Ensure it is in seconds.
@@ -92,9 +93,13 @@ export default class TileParticles {
                 particle.life = 0;
                 // Reset position to spawn point.
                 const tirePosition = carModel.position.x + (1.25 * this.right)
-                particle.position.set(tirePosition, -7.5, 3.1);
+                particle.position.set(tirePosition + (Math.random() - 0.5) * 0.125, -7.5, 3.1);
                 // Make it visible.
                 particle.scale.set(Math.random() * 0.5 + 0.1, Math.random() * 0.5 + 0.1, Math.random() * 0.5 + 0.1);
+                // Reset particle velocity
+                particle.velocity.set((Math.random() - 0.5) * 3, 5 + Math.random() * 5, 10 + Math.random() * 3)
+                // Reset particle rotation
+                particle.rotation.set(0, 0, 90)
             }
 
             if (particle.active) {
@@ -114,6 +119,9 @@ export default class TileParticles {
                     particle.position.addScaledVector(particle.velocity, deltaTime);
                     particle.rotation.x += deltaTime * 10
                     particle.rotation.y += deltaTime * 3
+                    // Increase z velocity here
+                    particle.velocity.z += deltaTime * this.experience.world.terrain.currentSpeed
+                    particle.velocity.y -= deltaTime * 9.8
                 }
             }
 
