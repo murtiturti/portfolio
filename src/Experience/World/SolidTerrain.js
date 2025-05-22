@@ -16,6 +16,7 @@ export default class SolidTerrain extends Terrain
         this.uniforms.uBigHillElevation = mainTerrain.uniforms.uBigHillElevation
         this.uniforms.uBigHillFrequency = mainTerrain.uniforms.uBigHillFrequency
         this.uniforms.uRoadElevation = mainTerrain.uniforms.uRoadElevation
+        this.uniforms.uValleyDepth = mainTerrain.uniforms.uValleyDepth
 
         // Create the solid terrain material with shared uniforms
         this.material = new THREE.ShaderMaterial({

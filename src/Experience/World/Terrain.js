@@ -66,7 +66,7 @@ export default class Terrain
                 .add(this.material.uniforms.uBigHillElevation, 'value')
                 .name('Big Hill Elevation')
                 .min(0)
-                .max(10)
+                .max(20)
                 .step(0.01)
             this.debugFolder.add(this.material.uniforms.uBigHillFrequency.value, 'x')
                 .name('Big Hill Frequency X')
@@ -82,6 +82,11 @@ export default class Terrain
                 .name('Road Elevation')
                 .min(-10)
                 .max(0)
+                .step(0.01)
+            this.debugFolder.add(this.material.uniforms.uValleyDepth, 'value')
+                .name('Valley Depth')
+                .min(8)
+                .max(50)
                 .step(0.01)
         }
     }
