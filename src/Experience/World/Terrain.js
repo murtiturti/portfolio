@@ -21,7 +21,8 @@ export default class Terrain
             uRoadElevation: new THREE.Uniform(-8),
             uValleyDepth: new THREE.Uniform(27.8),
             uCarYRotation: new THREE.Uniform(0),
-            uDistance: new THREE.Uniform(0)
+            uDistance: new THREE.Uniform(0),
+            uHorizonLineIntensity: new THREE.Uniform(3.0)
         }
 
         this.distance = 0

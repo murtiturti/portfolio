@@ -5,6 +5,7 @@ uniform float uValleyDepth;
 uniform vec2 uBigHillFrequency;
 uniform float uCarYRotation;
 uniform float uDistance;
+uniform float uHorizonLineIntensity;
 
 
 #include ../includes/cnoise
@@ -28,6 +29,8 @@ void main()
     elevation -= (1.0 - fade) * -uRoadElevation;
 
     modelPosition.y += elevation;
+
+    modelPosition.y -= diff * diff * uHorizonLineIntensity;
 
     vec4 viewPosition = viewMatrix * modelPosition;
     vec4 projectedPosition = projectionMatrix * viewPosition;
