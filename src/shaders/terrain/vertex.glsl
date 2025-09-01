@@ -14,7 +14,7 @@ void main()
     vec4 modelPosition = modelMatrix * vec4(position, 1.0);
 
     // Elevation
-    float elevation = cnoise(vec3(modelPosition.xz * uBigHillFrequency, uTime)) * uBigHillElevation;
+    float elevation = cnoise(vec3(modelPosition.x * uBigHillFrequency.x, modelPosition.z * uBigHillFrequency.y - uTime, 0.0)) * uBigHillElevation;
 
     // Curve
     float xOffset = sin(0.3 * uv.y + uTime) * sin(0.1 * uv.y + uTime) * 3.0;
