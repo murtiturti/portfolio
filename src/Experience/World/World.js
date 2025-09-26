@@ -12,6 +12,7 @@ import ParticleEmitter from "../Utils/ParticleEmitter.js";
 import TileParticles from "./TileParticles.js";
 import * as THREE from 'three'
 import Billboard from "./Billboard.js";
+import BillboardController from "../BillboardController.js";
 
 export default class World
 {
@@ -39,6 +40,10 @@ export default class World
             // this.scene.add(this.particles)
 
             this.billboard = new Billboard('foxModel') // resource load test until billboard model is ready
+            this.billboards = [ this.billboard ]
+
+            this.billboardController = new BillboardController(this.billboards)
+            this.billboardController.spawn()
         })
     }
 
@@ -69,6 +74,10 @@ export default class World
         if (this.billboard)
         {
             this.billboard.update()
+        }
+        if (this.billboardController)
+        {
+            this.billboardController.update()
         }
 
     }

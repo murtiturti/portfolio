@@ -15,7 +15,6 @@ export default class Billboard
         this.billboardDefaultHeight = 0
         
         this.setModel()
-        this.setActive(false)
     }
 
     setModel()
@@ -60,7 +59,8 @@ export default class Billboard
     {
         if (this.isActive)
         {
-            // Do whatever logic here if needed
+            // TODO: Change the magic number for this purpose accross the project
+            this.model.position.z += this.experience.world.terrain.currentSpeed * this.experience.time.delta * 0.001
         }   
     }
 }
