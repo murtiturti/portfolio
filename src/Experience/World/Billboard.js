@@ -13,6 +13,7 @@ export default class Billboard
         this.resource = this.resources.items[resourceName]
         
         this.billboardDefaultHeight = 0
+        this.isActive = false
         
         this.setModel()
     }

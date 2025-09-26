@@ -40,7 +40,8 @@ export default class World
             // this.scene.add(this.particles)
 
             this.billboard = new Billboard('foxModel') // resource load test until billboard model is ready
-            this.billboards = [ this.billboard ]
+            this.billboards = [ this.billboard, new Billboard('foxModel') ]
+            console.log(this.billboards)
 
             this.billboardController = new BillboardController(this.billboards)
             this.billboardController.spawn()
@@ -71,14 +72,9 @@ export default class World
             this.particlesRight.update()
             this.particlesLeft.update()
         }
-        if (this.billboard)
-        {
-            this.billboard.update()
-        }
         if (this.billboardController)
         {
             this.billboardController.update()
         }
-
     }
 }

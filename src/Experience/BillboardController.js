@@ -30,6 +30,7 @@ export default class BillboardController
     update()
     {
         const activeBillboard = this.billboardsArray[this.activeBillboardIndex]
+        activeBillboard.update()
         if (activeBillboard.model.position.z > this.experience.world.car.model.position.z)
         {
             this.despawn()
