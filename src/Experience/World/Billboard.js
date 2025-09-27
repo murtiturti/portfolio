@@ -27,6 +27,7 @@ export default class Billboard
         this.model.position.z = -10
         this.model.scale.x = 2
         this.model.scale.z = 0.2
+        this.model.visible = false;
 
         this.scene.add(this.model)
         this.hoverAnimation = gsap.to(
