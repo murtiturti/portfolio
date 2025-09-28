@@ -24,7 +24,7 @@ void main()
     diff = clamp(diff, 0.0, 0.5) / 0.5;
     float side = uCarYRotation / 30.0;
 
-    float fade = smoothstep(0.0, uValleyDepth + abs(sin(uTime)) * 8.0, abs(modelPosition.x + xOffset));
+    float fade = smoothstep(0.0, uValleyDepth, abs(modelPosition.x)); // + x offset to model position screwed it up, but looks like the calculation is correct, second param had + abs(sin(uTime))
     elevation *= fade;
     elevation -= (1.0 - fade) * -uRoadElevation;
 

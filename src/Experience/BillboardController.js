@@ -11,7 +11,7 @@ export default class BillboardController
         this.billboardsArray = billboardsArray
         this.activeBillboardIndex = 0 // for initial spawn
 
-        this.spawnPositionZ = -10
+        this.spawnPositionZ = -20
     }
 
     spawn()
