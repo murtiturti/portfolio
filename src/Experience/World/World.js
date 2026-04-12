@@ -11,6 +11,7 @@ import Background from "./Background.js";
 import ParticleEmitter from "../Utils/ParticleEmitter.js";
 import TileParticles from "./TileParticles.js";
 import ProgressSlider from "../Utils/ProgressSlider.js";
+import SpaceStation from "./SpaceStation.js";
 import * as THREE from 'three'
 
 export default class World
@@ -39,6 +40,7 @@ export default class World
             // this.scene.add(this.particles)
 
             this.progressSlider = new ProgressSlider()
+            this.spaceStation = new SpaceStation()
         })
     }
 
@@ -69,6 +71,10 @@ export default class World
         if (this.progressSlider)
         {
             this.progressSlider.update()
+        }
+        if (this.spaceStation)
+        {
+            this.spaceStation.update()
         }
 
     }
