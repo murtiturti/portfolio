@@ -31,9 +31,9 @@ export default class Terrain
         this.baseHillElevation = this.uniforms.uBigHillElevation.value
         this.baseRoadElevation = this.uniforms.uRoadElevation.value
 
-        this.maxSpeed = 10
+        this.maxSpeed = 15
         this.currentSpeed = 0
-        this.acceleration = 0.0075
+        this.acceleration = 0.0095
         this.deceleration = -0.05
 
         if (this.debug.active)
@@ -99,6 +99,21 @@ export default class Terrain
                 .min(100)
                 .max(2000)
                 .step(1)
+            this.debugFolder.add(this, 'acceleration')
+                .name('Acceleration')
+                .min(0.001)
+                .max(0.05)
+                .step(0.0001)
+            this.debugFolder.add(this, 'deceleration')
+                .name('Deceleration')
+                .min(-0.2)
+                .max(-0.001)
+                .step(0.001)
+            this.debugFolder.add(this, 'maxSpeed')
+                .name('Max Speed')
+                .min(1)
+                .max(30)
+                .step(0.1)
         }
     }
 
