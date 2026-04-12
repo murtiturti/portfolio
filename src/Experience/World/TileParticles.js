@@ -11,8 +11,9 @@ export default class TileParticles {
         // Spawning and lifetime parameters:
         this.spawnRate = 10;              // Number of particles to spawn per second.
         this.spawnInterval = 1 / this.spawnRate; // Time interval (seconds) between spawns.
-        this.lifetime = 3;                // Lifetime (in seconds) of each particle.
+        this.lifetime = 1.2;              // Lifetime (in seconds) of each particle.
         this.elapsedTime = 0;             // Global elapsed time tracker.
+        this.wasEmitting = false;
         this.right = right
 
         this.geometry = new THREE.PlaneGeometry(1, 1);
@@ -68,8 +69,20 @@ export default class TileParticles {
         deltaTime *= 0.001;
 
 
-        // Only spawn new particles if current speed is at least half of max speed
-        const emit = this.experience.world.terrain.currentSpeed >= (this.experience.world.terrain.maxSpeed * 0.5)
+        const emit = this.experience.world.terrain.currentSpeed >= (this.experience.world.terrain.maxSpeed * 0.2)
+
+        // On emission start, stagger the pool so particles don't all spawn at once
+        if (emit && !this.wasEmitting)
+        {
+            for (let i = 0; i < this.maxCount; i++)
+            {
+                if (!this.particles[i].active)
+                {
+                    this.particles[i].spawnTime = this.elapsedTime + i * this.spawnInterval
+                }
+            }
+        }
+        this.wasEmitting = emit
 
         if (emit)
         {
@@ -83,11 +96,11 @@ export default class TileParticles {
 
             if (!emit && !particle.active)
             {
-                particle.spawnTime += deltaTime
+                particle.spawnTime = this.elapsedTime
             }
 
             // If the particle is inactive and its scheduled spawn time has arrived, activate it.
-            if (!particle.active && this.elapsedTime >= particle.spawnTime) 
+            if (!particle.active && emit && this.elapsedTime >= particle.spawnTime) 
             {
                 particle.active = true;
                 particle.life = 0;

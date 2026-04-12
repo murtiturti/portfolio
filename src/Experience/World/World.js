@@ -35,8 +35,8 @@ export default class World
             //this.backgroundPlane = new Background()
             this.environment = new Environment()
 
-            this.particlesRight = new TileParticles(40, 1)
-            this.particlesLeft = new TileParticles(40, -1)
+            this.particlesRight = new TileParticles(80, 1)
+            this.particlesLeft = new TileParticles(80, -1)
             // this.scene.add(this.particles)
 
             this.progressSlider = new ProgressSlider()
