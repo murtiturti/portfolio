@@ -35,8 +35,24 @@ export default class Experience
         this.time = new Time()
         this.userInput = new UserInput()
         this.scene = new THREE.Scene()
-        this.backgroundTexture = new GradientTexture('#ff0000', '#0000ff')
-        this.scene.background = this.backgroundTexture.gradientTexture
+        this.backgroundTexture = new GradientTexture([
+            [0.0,  '#0a0015'],  // near-black deep purple
+            [0.25, '#2b0060'],  // dark violet
+            [0.45, '#d4006e'],  // hot magenta
+            [0.6,  '#ff4500'],  // neon orange-red
+            [0.75, '#ff9900'],  // amber
+            [1.0,  '#ff9900'],  // hold amber to bottom
+        ])
+        const skyGeo = new THREE.SphereGeometry(100, 32, 16)
+        const skyMat = new THREE.MeshBasicMaterial({
+            map: this.backgroundTexture.gradientTexture,
+            side: THREE.BackSide,
+            depthWrite: false,
+            depthTest: false,
+        })
+        const skyMesh = new THREE.Mesh(skyGeo, skyMat)
+        skyMesh.renderOrder = -1
+        this.scene.add(skyMesh)
         this.resources = new Resources(sources)
         this.camera = new Camera()
         this.renderer = new Renderer()
