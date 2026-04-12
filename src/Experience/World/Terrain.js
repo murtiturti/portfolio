@@ -27,6 +27,10 @@ export default class Terrain
 
         this.distance = 0
         this.finishDistance = 500
+        this.flattenAmount = 0
+        this.baseHillElevation = this.uniforms.uBigHillElevation.value
+        this.baseRoadElevation = this.uniforms.uRoadElevation.value
+
         this.maxSpeed = 10
         this.currentSpeed = 0
         this.acceleration = 0.0075
@@ -107,6 +111,14 @@ export default class Terrain
 
     update()
     {
+        // Smoothstep from 50% to 60% of finishDistance (0 = normal, 1 = fully flat)
+        const flatStart = this.finishDistance * 0.5
+        const flatEnd = this.finishDistance * 0.6
+        const raw = Math.max(0, Math.min(1, (this.distance - flatStart) / (flatEnd - flatStart)))
+        this.flattenAmount = raw * raw * (3 - 2 * raw)
+        this.uniforms.uBigHillElevation.value = this.baseHillElevation * (1 - this.flattenAmount)
+        this.uniforms.uRoadElevation.value  = this.baseRoadElevation  * (1 - this.flattenAmount)
+
         const slider = this.experience.world?.progressSlider
         if (slider?.isDragging)
         {
