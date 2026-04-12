@@ -1,4 +1,4 @@
-import Experience from "./Experience/experience"
+import Experience from "./Experience/Experience"
 const experience = new Experience(document.querySelector('canvas.webgl'))
 
 // import * as THREE from 'three'
