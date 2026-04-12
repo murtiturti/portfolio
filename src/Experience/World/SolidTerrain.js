@@ -36,4 +36,9 @@ export default class SolidTerrain extends Terrain
 
         this.mesh.position.y -= 0.05
     }
+
+    update()
+    {
+        this.material.uniforms.uTime.value = this.experience.world.terrain.distance
+    }
 }

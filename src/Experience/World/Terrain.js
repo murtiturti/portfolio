@@ -26,6 +26,7 @@ export default class Terrain
         }
 
         this.distance = 0
+        this.finishDistance = 500
         this.maxSpeed = 10
         this.currentSpeed = 0
         this.acceleration = 0.0075
@@ -89,6 +90,11 @@ export default class Terrain
                 .min(8)
                 .max(50)
                 .step(0.01)
+            this.debugFolder.add(this, 'finishDistance')
+                .name('Finish Distance')
+                .min(100)
+                .max(2000)
+                .step(1)
         }
     }
 
@@ -101,6 +107,20 @@ export default class Terrain
 
     update()
     {
+        const slider = this.experience.world?.progressSlider
+        if (slider?.isDragging)
+        {
+            this.currentSpeed = 0
+            this.material.uniforms.uTime.value = this.distance
+            return
+        }
+
+        if (this.distance >= this.finishDistance)
+        {
+            this.currentSpeed = 0
+            return
+        }
+
         if (this.experience.moving)
         {
             this.currentSpeed += this.acceleration
@@ -109,9 +129,10 @@ export default class Terrain
         {
             this.currentSpeed += this.deceleration
         }
-        
+
         this.currentSpeed = Math.min(Math.max(this.currentSpeed, 0), this.maxSpeed)
         this.distance += this.currentSpeed * this.time.delta * 0.0001
+        this.distance = Math.min(this.distance, this.finishDistance)
         this.material.uniforms.uTime.value = this.distance
         // this.material.uniforms.uTime.value = this.experience.totalHoldTime * 0.0005 * Math.min(this.currentSpeed, this.maxSpeed)
         // this.material.uniforms.uCarYRotation.value = -this.experience.world.car.model.rotation.y * (180 / Math.PI)

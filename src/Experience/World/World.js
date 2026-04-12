@@ -10,6 +10,7 @@ import SunOuter from "./SunOuter";
 import Background from "./Background.js";
 import ParticleEmitter from "../Utils/ParticleEmitter.js";
 import TileParticles from "./TileParticles.js";
+import ProgressSlider from "../Utils/ProgressSlider.js";
 import * as THREE from 'three'
 
 export default class World
@@ -36,6 +37,8 @@ export default class World
             this.particlesRight = new TileParticles(40, 1)
             this.particlesLeft = new TileParticles(40, -1)
             // this.scene.add(this.particles)
+
+            this.progressSlider = new ProgressSlider()
         })
     }
 
@@ -62,6 +65,10 @@ export default class World
         {
             this.particlesRight.update()
             this.particlesLeft.update()
+        }
+        if (this.progressSlider)
+        {
+            this.progressSlider.update()
         }
 
     }
