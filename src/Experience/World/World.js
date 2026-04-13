@@ -13,6 +13,7 @@ import TileParticles from "./TileParticles.js";
 import ProgressSlider from "../Utils/ProgressSlider.js";
 import SpaceStation from "./SpaceStation.js";
 import ResumeScroll from "./ResumeScroll.js";
+import HintText from "./HintText.js";
 import * as THREE from 'three'
 
 export default class World
@@ -43,6 +44,8 @@ export default class World
             this.progressSlider = new ProgressSlider()
             this.spaceStation = new SpaceStation()
             this.resumeScroll = new ResumeScroll()
+            this.hintText = new HintText('press and hold anywhere to move', 0)
+            this.hintText2 = new HintText('use the slider to fast forward or rewind', this.terrain.finishDistance * 0.10)
         })
     }
 
@@ -81,6 +84,14 @@ export default class World
         if (this.resumeScroll)
         {
             this.resumeScroll.update()
+        }
+        if (this.hintText)
+        {
+            this.hintText.update()
+        }
+        if (this.hintText2)
+        {
+            this.hintText2.update()
         }
     }
 }
