@@ -1,0 +1,38 @@
+{
+  "name": "Murat Diken",
+  "title": "Full Stack Developer",
+  "experiences": [
+    {
+      "company": "Acme Corp",
+      "role": "Senior Frontend Engineer",
+      "period": "2022 – Present",
+      "bullets": [
+        "Built interactive 3D experiences with Three.js and WebGL",
+        "Led frontend architecture for a React + TypeScript SaaS platform",
+        "Improved build pipeline performance by 40% with Vite"
+      ]
+    },
+    {
+      "company": "Startup Co",
+      "role": "Full Stack Developer",
+      "period": "2019 – 2022",
+      "bullets": [
+        "Designed Node.js REST APIs serving 500K+ monthly users",
+        "Built real-time dashboards with WebSockets and D3.js",
+        "Migrated legacy PHP codebase to modern Node/React stack"
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "name": "Synthwave Portfolio",
+      "description": "Interactive 3D driving experience built with Three.js. Procedural terrain, particle systems, and a full narrative arc.",
+      "url": ""
+    },
+    {
+      "name": "Project Two",
+      "description": "A description of another notable project goes here. Replace with your real projects.",
+      "url": "https://github.com/example"
+    }
+  ]
+}
