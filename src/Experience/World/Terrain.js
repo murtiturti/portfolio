@@ -26,7 +26,7 @@ export default class Terrain
         }
 
         this.distance = 0
-        this.finishDistance = 500
+        this.finishDistance = 100
         this.flattenAmount = 0
         this.baseHillElevation = this.uniforms.uBigHillElevation.value
         this.baseRoadElevation = this.uniforms.uRoadElevation.value
@@ -128,7 +128,7 @@ export default class Terrain
     {
         // Smoothstep from 50% to 60% of finishDistance (0 = normal, 1 = fully flat)
         const flatStart = this.finishDistance * 0.5
-        const flatEnd = this.finishDistance * 0.6
+        const flatEnd = this.finishDistance * 0.53
         const raw = Math.max(0, Math.min(1, (this.distance - flatStart) / (flatEnd - flatStart)))
         this.flattenAmount = raw * raw * (3 - 2 * raw)
         this.uniforms.uBigHillElevation.value = this.baseHillElevation * (1 - this.flattenAmount)
