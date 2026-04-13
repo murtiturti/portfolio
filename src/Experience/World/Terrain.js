@@ -148,7 +148,11 @@ export default class Terrain
             return
         }
 
-        if (this.experience.moving)
+        if (this.distance >= flatStart)
+        {
+            this.currentSpeed = this.experience.moving ? this.maxSpeed : 0
+        }
+        else if (this.experience.moving)
         {
             this.currentSpeed += this.acceleration
         }
