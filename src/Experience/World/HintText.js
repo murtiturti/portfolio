@@ -79,13 +79,14 @@ export default class HintText
         const terrain = this.experience.world.terrain
         const elapsed = this.experience.time.elapsed * 0.001   // seconds
 
-        if (terrain.distance < this.spawnDistance)
+        const z = -15 + (terrain.distance - this.spawnDistance) * 8
+
+        if (terrain.distance < this.spawnDistance || z >= 24)
         {
             this.mesh.visible = false
             return
         }
 
-        const z = -15 + (terrain.distance - this.spawnDistance) * 8
         this.mesh.position.z = z
 
         // Fade out as it passes the camera (z: 8 → 22)
@@ -96,7 +97,7 @@ export default class HintText
         const flicker = 0.82 + Math.sin(elapsed * 9.1) * 0.09 + Math.sin(elapsed * 19.7) * 0.06
 
         this.material.opacity = opacity * flicker
-        this.mesh.visible     = z < 24
+        this.mesh.visible     = true
 
         // Y-axis billboard — always face camera
         const cam = this.experience.camera.instance

@@ -249,7 +249,7 @@ export default class ResumeScroll
         const fd = terrain.finishDistance
         const dist = terrain.distance
 
-        this.group.visible = dist >= fd * 0.65
+        this.group.visible = dist >= fd * 0.55
 
         if (this.group.visible)
         {
@@ -258,7 +258,7 @@ export default class ResumeScroll
 
             // Center on car X
             this.group.position.x = car.position.x
-            this.group.position.y = GROUP_START_Y - (dist - fd * 0.65) * SCROLL_SPEED
+            this.group.position.y = GROUP_START_Y - (dist - fd * 0.55) * SCROLL_SPEED
 
             // Rotate group to face camera (Y axis only, no tilt)
             this.group.rotation.y = Math.atan2(

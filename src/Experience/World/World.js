@@ -44,8 +44,10 @@ export default class World
             this.progressSlider = new ProgressSlider()
             this.spaceStation = new SpaceStation()
             this.resumeScroll = new ResumeScroll()
-            this.hintText = new HintText('press and hold anywhere to move', 0)
+            this.hintText  = new HintText('press and hold anywhere to move', 0)
             this.hintText2 = new HintText('use the slider to fast forward or rewind', this.terrain.finishDistance * 0.10)
+            this.hintText3 = new HintText('check my profiles from the links', this.terrain.finishDistance * 0.30)
+            this.hintText4 = new HintText('stay tuned for my resume', this.terrain.finishDistance * 0.40)
         })
     }
 
@@ -92,6 +94,14 @@ export default class World
         if (this.hintText2)
         {
             this.hintText2.update()
+        }
+        if (this.hintText3)
+        {
+            this.hintText3.update()
+        }
+        if (this.hintText4)
+        {
+            this.hintText4.update()
         }
     }
 }

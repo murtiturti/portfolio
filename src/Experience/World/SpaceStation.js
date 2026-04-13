@@ -102,8 +102,8 @@ export default class SpaceStation
         const terrain = this.experience.world.terrain
         const car = this.experience.world.car
 
-        const activationDistance = terrain.finishDistance * 0.5
-        const arrivalDistance = terrain.finishDistance * 0.57
+        const activationDistance = terrain.finishDistance * 0.43
+        const arrivalDistance = terrain.finishDistance * 0.47
         const targetZ = car.model.position.z - 15
 
         const isActive = terrain.distance >= activationDistance
@@ -121,8 +121,8 @@ export default class SpaceStation
         const fd = terrain.finishDistance
         const dist = terrain.distance
 
-        // Pre-launch (0.57–0.60): engine glow + vibration
-        const prelaunchT = Math.max(0, Math.min(1, (dist - fd * 0.57) / (fd * 0.03)))
+        // Pre-launch (0.47–0.50): engine glow + vibration
+        const prelaunchT = Math.max(0, Math.min(1, (dist - fd * 0.47) / (fd * 0.03)))
         this.engineLight.intensity = prelaunchT * 8
         if (prelaunchT > 0 && prelaunchT < 1)
         {
@@ -133,25 +133,25 @@ export default class SpaceStation
             this.rocketGroup.position.x = 0
         }
 
-        // Phase 1 (0.60–0.63): ease-in to 60 units over fd*0.03
-        const phase1T = Math.max(0, Math.min(1, (dist - fd * 0.60) / (fd * 0.03)))
+        // Phase 1 (0.50–0.53): ease-in to 60 units over fd*0.03
+        const phase1T = Math.max(0, Math.min(1, (dist - fd * 0.50) / (fd * 0.03)))
         const rocketPhase1Y = phase1T * phase1T * 60
-        // Phase 2 (0.63+): constant speed matching derivative at end of phase 1
+        // Phase 2 (0.53+): constant speed matching derivative at end of phase 1
         // d(t²*60)/d(dist) at t=1 = 2*60/(fd*0.03) = 40 units per fd-unit
         const phase2Speed = 40
-        const rocketPhase2Y = dist > fd * 0.63 ? (dist - fd * 0.63) * phase2Speed : 0
+        const rocketPhase2Y = dist > fd * 0.53 ? (dist - fd * 0.53) * phase2Speed : 0
         this.rocketGroup.position.y = 0.7 + rocketPhase1Y + rocketPhase2Y
 
         // easedLaunch for group tilt: based on phase1T only (fully straight by 0.63)
         const easedLaunch = phase1T * phase1T
 
-        // Camera: tracks rocket Y during 0.60-0.63, then gentle independent scroll
+        // Camera: tracks rocket Y during 0.50-0.53, then gentle independent scroll
         const cameraScrollSpeed = 3
-        const cameraPhase2 = Math.min(Math.max(0, dist - fd * 0.63), fd * 0.02)
+        const cameraPhase2 = Math.min(Math.max(0, dist - fd * 0.53), fd * 0.02)
         const cameraExtraY = phase1T < 1
             ? rocketPhase1Y
             : 60 + cameraPhase2 * cameraScrollSpeed
-        this.experience.camera.cameraExtraY = dist >= fd * 0.60 ? cameraExtraY : 0
+        this.experience.camera.cameraExtraY = dist >= fd * 0.50 ? cameraExtraY : 0
 
         // Follow horizon curve — unclamped quadratic extends beyond terrain bounds
         const H = terrain.uniforms.uHorizonLineIntensity.value

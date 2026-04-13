@@ -119,7 +119,7 @@ export default class Experience
         const dist = this.world?.terrain?.distance
         if (fd == null || dist == null) return
 
-        const spaceT = Math.max(0, Math.min(1, (dist - fd * 0.60) / (fd * 0.015)))
+        const spaceT = Math.max(0, Math.min(1, (dist - fd * 0.50) / (fd * 0.015)))
         if (spaceT === this._lastSpaceT) return
         this._lastSpaceT = spaceT
 
