@@ -22,4 +22,13 @@ export default class GradientTexture
         this.gradientTexture = new THREE.CanvasTexture(this.canvas)
         this.gradientTexture.colorSpace = THREE.SRGBColorSpace
     }
+
+    update(stops)
+    {
+        const grad = this.context.createLinearGradient(0, 0, 0, 512)
+        for (const [pos, color] of stops) grad.addColorStop(pos, color)
+        this.context.fillStyle = grad
+        this.context.fillRect(0, 0, 2, 512)
+        this.gradientTexture.needsUpdate = true
+    }
 }

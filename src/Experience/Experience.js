@@ -1,4 +1,11 @@
 import * as THREE from 'three'
+
+const _c1 = new THREE.Color()
+const _c2 = new THREE.Color()
+function lerpHex(a, b, t) {
+    return '#' + _c1.set(a).lerp(_c2.set(b), t).getHexString()
+}
+
 import Sizes from "./Utils/Sizes"
 import Time from "./Utils/Time"
 import Camera from './Camera'
@@ -62,6 +69,11 @@ export default class Experience
         this.totalHoldTime = 0
         this.currentHoldTime = 0
 
+        // Sky transition state
+        this._sunsetStops = [[0,'#0a0015'],[0.25,'#2b0060'],[0.45,'#d4006e'],[0.6,'#ff4500'],[0.75,'#ff9900'],[1.0,'#ff9900']]
+        this._spaceStops  = [[0,'#000000'],[0.25,'#00001a'],[0.45,'#000033'],[0.6,'#000022'],[0.75,'#000010'],[1.0,'#000000']]
+        this._lastSpaceT  = -1
+
         // Sizes resize event
         this.sizes.on('resize', () =>
         {
@@ -93,11 +105,28 @@ export default class Experience
         this.renderer.resize()
     }
 
-    update() 
+    update()
     {
         this.camera.update()
         this.world.update()
         this.renderer.update()
+        this._updateSky()
+    }
+
+    _updateSky()
+    {
+        const fd   = this.world?.terrain?.finishDistance
+        const dist = this.world?.terrain?.distance
+        if (fd == null || dist == null) return
+
+        const spaceT = Math.max(0, Math.min(1, (dist - fd * 0.60) / (fd * 0.015)))
+        if (spaceT === this._lastSpaceT) return
+        this._lastSpaceT = spaceT
+
+        const lerped = this._sunsetStops.map(([pos, sc], i) =>
+            [pos, lerpHex(sc, this._spaceStops[i][1], spaceT)]
+        )
+        this.backgroundTexture.update(lerped)
     }
 
     destroy()
