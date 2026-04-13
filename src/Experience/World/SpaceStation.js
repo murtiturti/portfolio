@@ -53,8 +53,13 @@ export default class SpaceStation
 
     buildRocket()
     {
-        const rocketGroup = new THREE.Group()
+        this.rocketGroup = new THREE.Group()
+        const rocketGroup = this.rocketGroup
         rocketGroup.position.y = 0.7  // sit on pad
+
+        this.engineLight = new THREE.PointLight(0xff6600, 0, 12)
+        this.engineLight.position.y = -1
+        rocketGroup.add(this.engineLight)
 
         // Body
         const bodyGeo = new THREE.CylinderGeometry(1, 1.4, 9, 12)
@@ -97,34 +102,80 @@ export default class SpaceStation
         const terrain = this.experience.world.terrain
         const car = this.experience.world.car
 
-        const activationDistance = terrain.finishDistance * 0.6
+        const activationDistance = terrain.finishDistance * 0.5
+        const arrivalDistance = terrain.finishDistance * 0.57
         const targetZ = car.model.position.z - 15
 
-        // Visibility driven purely by terrain distance
         const isActive = terrain.distance >= activationDistance
-        this.group.visible = isActive
-
-        if (isActive)
+        if (!isActive)
         {
-            // Z advances 1:1 with terrain distance past activation, clamped at target
-            const traveled = terrain.distance - activationDistance
-            this.group.position.z = Math.min(targetZ, this.startZ + traveled)
+            this.group.visible = false
+            this.experience.camera.cameraExtraY = 0
+            return
         }
 
-        // Follow horizon curve — unclamped quadratic extends beyond terrain bounds
-        const z = this.group.position.z
-        const H = terrain.uniforms.uHorizonLineIntensity.value
-        if (z < 0)
+        // Normalized t from activation to arrival, then clamp at targetZ
+        const t = Math.max(0, Math.min(1, (terrain.distance - activationDistance) / (arrivalDistance - activationDistance)))
+        const baseZ = this.startZ + t * (targetZ - this.startZ)
+
+        const fd = terrain.finishDistance
+        const dist = terrain.distance
+
+        // Pre-launch (0.57–0.60): engine glow + vibration
+        const prelaunchT = Math.max(0, Math.min(1, (dist - fd * 0.57) / (fd * 0.03)))
+        this.engineLight.intensity = prelaunchT * 8
+        if (prelaunchT > 0 && prelaunchT < 1)
         {
-            const diff = -z / 32
+            this.rocketGroup.position.x = (Math.random() - 0.5) * 0.3 * prelaunchT
+        }
+        else
+        {
+            this.rocketGroup.position.x = 0
+        }
+
+        // Phase 1 (0.60–0.63): ease-in to 60 units over fd*0.03
+        const phase1T = Math.max(0, Math.min(1, (dist - fd * 0.60) / (fd * 0.03)))
+        const rocketPhase1Y = phase1T * phase1T * 60
+        // Phase 2 (0.63+): constant speed matching derivative at end of phase 1
+        // d(t²*60)/d(dist) at t=1 = 2*60/(fd*0.03) = 40 units per fd-unit
+        const phase2Speed = 40
+        const rocketPhase2Y = dist > fd * 0.63 ? (dist - fd * 0.63) * phase2Speed : 0
+        this.rocketGroup.position.y = 0.7 + rocketPhase1Y + rocketPhase2Y
+
+        // easedLaunch for group tilt: based on phase1T only (fully straight by 0.63)
+        const easedLaunch = phase1T * phase1T
+
+        // Camera: tracks rocket Y during 0.60-0.63, then gentle independent scroll
+        const cameraScrollSpeed = 3
+        const cameraPhase2 = Math.min(Math.max(0, dist - fd * 0.63), fd * 0.02)
+        const cameraExtraY = phase1T < 1
+            ? rocketPhase1Y
+            : 60 + cameraPhase2 * cameraScrollSpeed
+        this.experience.camera.cameraExtraY = dist >= fd * 0.60 ? cameraExtraY : 0
+
+        // Follow horizon curve — unclamped quadratic extends beyond terrain bounds
+        const H = terrain.uniforms.uHorizonLineIntensity.value
+        let rx = 0
+        if (baseZ < 0)
+        {
+            const diff = -baseZ / 32
             this.group.position.y = -(diff * diff * H)
-            const slope = -H * z / 512  // dy/dz at this z
-            this.group.rotation.x = Math.atan2(-slope, 1)
+            const slope = -H * baseZ / 512  // dy/dz at this z
+            rx = Math.atan2(-slope, 1)
         }
         else
         {
             this.group.position.y = 0
-            this.group.rotation.x = 0
         }
+
+        // Straighten group tilt as rocket launches
+        this.group.rotation.x = rx * (1 - easedLaunch)
+
+        // Sink 0.39 units along local -Y (surface normal) to hide base underside
+        this.group.position.y -= Math.cos(rx) * 0.39
+        this.group.position.z = baseZ - Math.sin(rx) * 0.39
+
+        // Only show once past the sun
+        this.group.visible = this.group.position.z > -65
     }
 }
