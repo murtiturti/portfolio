@@ -12,8 +12,13 @@ export default class Camera
         this.canvas = this.experience.canvas
 
         // Reusable vectors to avoid per-frame allocation
-        this._targetPos = new THREE.Vector3()
-        this._lookAt    = new THREE.Vector3()
+        this._targetPos      = new THREE.Vector3()
+        this._lookAt         = new THREE.Vector3()
+        this._rocketWorldPos = new THREE.Vector3()
+
+        this.rocketTarget   = null
+        this.rocketSettings = { distance: 12, height: -4, lookAheadY: 8, lerp: 0.05 }
+        this.cameraExtraY   = 0
 
         // Follow camera settings
         this.followSettings = {
@@ -37,7 +42,7 @@ export default class Camera
             35,
             this.sizes.width / this.sizes.height,
             0.1,
-            150
+            500
         )
         this.instance.position.set(6, 4, 8)
         this.scene.add(this.instance)
@@ -98,13 +103,18 @@ export default class Camera
             car.position.z + Math.cos(angle) * distance
         )
 
+        this._targetPos.y = car.position.y + s.height + this.cameraExtraY
+
         this.instance.position.lerp(this._targetPos, s.lerp)
 
-        this._lookAt.set(
-            car.position.x - Math.sin(angle) * s.lookAhead,
-            car.position.y + s.lookAheadY,
-            car.position.z - Math.cos(angle) * s.lookAhead
-        )
-        this.instance.lookAt(this._lookAt)
+        if (this.cameraExtraY === 0)
+        {
+            this._lookAt.set(
+                car.position.x - Math.sin(angle) * s.lookAhead,
+                car.position.y + s.lookAheadY,
+                car.position.z - Math.cos(angle) * s.lookAhead
+            )
+            this.instance.lookAt(this._lookAt)
+        }
     }
 }
