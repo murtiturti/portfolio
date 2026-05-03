@@ -138,7 +138,7 @@ export default class Terrain
 
         if (!isDragging && this.distance < this.finishDistance)
         {
-            if (this.distance >= flatStart)
+            if (this.distance >= flatEnd)
             {
                 this.currentSpeed = this.experience.moving ? this.maxSpeed : 0
             }
