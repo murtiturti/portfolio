@@ -16,6 +16,7 @@ import sources from './sources.js'
 import Debug from './Utils/Debug.js'
 import GradientTexture from './Utils/GradientTexture.js'
 import UserInput from './Utils/UserInput.js'
+import timeline from './timeline.js'
 
 let instance = null
 
@@ -147,7 +148,7 @@ export default class Experience
         const { finishDistance: fd, distance: dist } = this.state
         if (!fd) return
 
-        const spaceT = Math.max(0, Math.min(1, (dist - fd * 0.50) / (fd * 0.015)))
+        const spaceT = Math.max(0, Math.min(1, (dist - fd * timeline.sky.transitionStart) / (fd * timeline.sky.transitionDuration)))
         if (spaceT === this._lastSpaceT) return
         this._lastSpaceT = spaceT
 

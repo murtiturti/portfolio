@@ -1,5 +1,8 @@
 import * as THREE from 'three'
 import Experience from '../Experience'
+import timeline from '../timeline.js'
+
+const PHASE1_HEIGHT = 60  // rocket Y at end of phase 1 (world units)
 
 export default class SpaceStation
 {
@@ -101,9 +104,10 @@ export default class SpaceStation
     {
         const { distance: dist, finishDistance: fd, horizonIntensity: H } = this.experience.state
         const car = this.experience.world.car
+        const t = timeline.station
 
-        const activationDistance = fd * 0.43
-        const arrivalDistance = fd * 0.47
+        const activationDistance = fd * t.activate
+        const arrivalDistance = fd * t.arrive
         const targetZ = car.model.position.z - 15
 
         const isActive = dist >= activationDistance
@@ -114,12 +118,13 @@ export default class SpaceStation
             return
         }
 
-        // Normalized t from activation to arrival, then clamp at targetZ
-        const t = Math.max(0, Math.min(1, (dist - activationDistance) / (arrivalDistance - activationDistance)))
-        const baseZ = this.startZ + t * (targetZ - this.startZ)
+        // Approach: 0..1 from activate to arrive
+        const approachT = Math.max(0, Math.min(1, (dist - activationDistance) / (arrivalDistance - activationDistance)))
+        const baseZ = this.startZ + approachT * (targetZ - this.startZ)
 
-        // Pre-launch (0.47–0.50): engine glow + vibration
-        const prelaunchT = Math.max(0, Math.min(1, (dist - fd * 0.47) / (fd * 0.03)))
+        // Prelaunch: arrive → launch (engine glow + vibration)
+        const prelaunchDuration = fd * (t.launch - t.arrive)
+        const prelaunchT = Math.max(0, Math.min(1, (dist - fd * t.arrive) / prelaunchDuration))
         this.engineLight.intensity = prelaunchT * 8
         if (prelaunchT > 0 && prelaunchT < 1)
         {
@@ -130,25 +135,26 @@ export default class SpaceStation
             this.rocketGroup.position.x = 0
         }
 
-        // Phase 1 (0.50–0.53): ease-in to 60 units over fd*0.03
-        const phase1T = Math.max(0, Math.min(1, (dist - fd * 0.50) / (fd * 0.03)))
-        const rocketPhase1Y = phase1T * phase1T * 60
-        // Phase 2 (0.53+): constant speed matching derivative at end of phase 1
-        // d(t²*60)/d(dist) at t=1 = 2*60/(fd*0.03) = 40 units per fd-unit
-        const phase2Speed = 40
-        const rocketPhase2Y = dist > fd * 0.53 ? (dist - fd * 0.53) * phase2Speed : 0
+        // Phase 1: launch → phase2 (ease-in to PHASE1_HEIGHT)
+        const phase1Duration = fd * (t.phase2 - t.launch)
+        const phase1T = Math.max(0, Math.min(1, (dist - fd * t.launch) / phase1Duration))
+        const rocketPhase1Y = phase1T * phase1T * PHASE1_HEIGHT
+        // Phase 2: constant speed matching derivative at end of phase 1 (C¹-continuous)
+        const phase2Speed = 2 * PHASE1_HEIGHT / phase1Duration
+        const rocketPhase2Y = dist > fd * t.phase2 ? (dist - fd * t.phase2) * phase2Speed : 0
         this.rocketGroup.position.y = 0.7 + rocketPhase1Y + rocketPhase2Y
 
-        // easedLaunch for group tilt: based on phase1T only (fully straight by 0.63)
+        // easedLaunch for group tilt: based on phase1T only (fully straight by phase2)
         const easedLaunch = phase1T * phase1T
 
-        // Camera: tracks rocket Y during 0.50-0.53, then gentle independent scroll
+        // Camera: tracks rocket Y during launch→phase2, then gentle scroll until cameraFollowEnd
         const cameraScrollSpeed = 3
-        const cameraPhase2 = Math.min(Math.max(0, dist - fd * 0.53), fd * 0.02)
+        const cameraScrollDuration = fd * (t.cameraFollowEnd - t.phase2)
+        const cameraPhase2 = Math.min(Math.max(0, dist - fd * t.phase2), cameraScrollDuration)
         const cameraExtraY = phase1T < 1
             ? rocketPhase1Y
-            : 60 + cameraPhase2 * cameraScrollSpeed
-        this.experience.camera.cameraExtraY = dist >= fd * 0.50 ? cameraExtraY : 0
+            : PHASE1_HEIGHT + cameraPhase2 * cameraScrollSpeed
+        this.experience.camera.cameraExtraY = dist >= fd * t.launch ? cameraExtraY : 0
 
         // Follow horizon curve — unclamped quadratic extends beyond terrain bounds
         let rx = 0

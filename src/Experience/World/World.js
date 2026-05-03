@@ -14,6 +14,7 @@ import ProgressSlider from "../Utils/ProgressSlider.js";
 import SpaceStation from "./SpaceStation.js";
 import ResumeScroll from "./ResumeScroll.js";
 import HintText from "./HintText.js";
+import timeline from "../timeline.js";
 import * as THREE from 'three'
 
 export default class World
@@ -44,10 +45,11 @@ export default class World
             this.progressSlider = new ProgressSlider()
             this.spaceStation = new SpaceStation()
             this.resumeScroll = new ResumeScroll()
-            this.hintText  = new HintText('press and hold anywhere to move', 0)
-            this.hintText2 = new HintText('use the slider to fast forward or rewind', this.terrain.finishDistance * 0.10)
-            this.hintText3 = new HintText('check my profiles from the links', this.terrain.finishDistance * 0.30)
-            this.hintText4 = new HintText('stay tuned for my resume', this.terrain.finishDistance * 0.40)
+            const fd = this.terrain.finishDistance
+            this.hintText  = new HintText('press and hold anywhere to move',          fd * timeline.hints.move)
+            this.hintText2 = new HintText('use the slider to fast forward or rewind', fd * timeline.hints.slider)
+            this.hintText3 = new HintText('check my profiles from the links',         fd * timeline.hints.links)
+            this.hintText4 = new HintText('stay tuned for my resume',                 fd * timeline.hints.resume)
         })
     }
 

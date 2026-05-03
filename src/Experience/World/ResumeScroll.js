@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import Experience from '../Experience'
+import timeline from '../timeline.js'
 import resumeData from '../../data/resume.json'
 
 const CANVAS_W     = 1400   // fixed canvas px width (text resolution)
@@ -246,8 +247,9 @@ export default class ResumeScroll
     update()
     {
         const { distance: dist, finishDistance: fd } = this.experience.state
+        const startDist = fd * timeline.resume.start
 
-        this.group.visible = dist >= fd * 0.55
+        this.group.visible = dist >= startDist
 
         if (this.group.visible)
         {
@@ -256,7 +258,7 @@ export default class ResumeScroll
 
             // Center on car X
             this.group.position.x = car.position.x
-            this.group.position.y = GROUP_START_Y - (dist - fd * 0.55) * SCROLL_SPEED
+            this.group.position.y = GROUP_START_Y - (dist - startDist) * SCROLL_SPEED
 
             // Rotate group to face camera (Y axis only, no tilt)
             this.group.rotation.y = Math.atan2(

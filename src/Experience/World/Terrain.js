@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import Experience from '../Experience.js'
+import timeline from '../timeline.js'
 import terrainVertexShader from '../../shaders/terrain/vertex.glsl'
 import terrainFragmentShader from '../../shaders/terrain/fragment.glsl'
 
@@ -126,8 +127,8 @@ export default class Terrain
 
     update()
     {
-        const flatStart = this.finishDistance * 0.43
-        const flatEnd = this.finishDistance * 0.47
+        const flatStart = this.finishDistance * timeline.terrain.flattenStart
+        const flatEnd = this.finishDistance * timeline.terrain.flattenEnd
         const raw = Math.max(0, Math.min(1, (this.distance - flatStart) / (flatEnd - flatStart)))
         this.flattenAmount = raw * raw * (3 - 2 * raw)
         this.uniforms.uBigHillElevation.value = this.baseHillElevation * (1 - this.flattenAmount)
