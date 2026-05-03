@@ -84,10 +84,7 @@ export default class ProgressSlider {
     }
 
     update() {
-        const terrain = this.terrain
-        if (!terrain) return
-
-        const progress = Math.min(terrain.distance / terrain.finishDistance, 1)
+        const progress = Math.min(this.experience.state.progress, 1)
         const percent = (progress * 100).toFixed(2) + '%'
 
         this.fill.style.height = percent

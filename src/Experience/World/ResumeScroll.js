@@ -245,9 +245,7 @@ export default class ResumeScroll
 
     update()
     {
-        const terrain = this.experience.world.terrain
-        const fd = terrain.finishDistance
-        const dist = terrain.distance
+        const { distance: dist, finishDistance: fd } = this.experience.state
 
         this.group.visible = dist >= fd * 0.55
 

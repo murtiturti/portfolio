@@ -26,12 +26,12 @@ export default class Terrain
         }
 
         this.distance = 0
-        this.finishDistance = 100
+        this.finishDistance = this.experience.state.finishDistance
         this.flattenAmount = 0
         this.baseHillElevation = this.uniforms.uBigHillElevation.value
         this.baseRoadElevation = this.uniforms.uRoadElevation.value
 
-        this.maxSpeed = 15
+        this.maxSpeed = this.experience.state.maxSpeed
         this.currentSpeed = 0
         this.acceleration = 0.0095
         this.deceleration = -0.05
@@ -126,7 +126,6 @@ export default class Terrain
 
     update()
     {
-        // Smoothstep from 50% to 60% of finishDistance (0 = normal, 1 = fully flat)
         const flatStart = this.finishDistance * 0.43
         const flatEnd = this.finishDistance * 0.47
         const raw = Math.max(0, Math.min(1, (this.distance - flatStart) / (flatEnd - flatStart)))
@@ -134,38 +133,31 @@ export default class Terrain
         this.uniforms.uBigHillElevation.value = this.baseHillElevation * (1 - this.flattenAmount)
         this.uniforms.uRoadElevation.value  = this.baseRoadElevation  * (1 - this.flattenAmount)
 
-        const slider = this.experience.world?.progressSlider
-        if (slider?.isDragging)
-        {
-            this.currentSpeed = 0
-            this.material.uniforms.uTime.value = this.distance
-            return
-        }
+        const isDragging = this.experience.world?.progressSlider?.isDragging ?? false
 
-        if (this.distance >= this.finishDistance)
+        if (!isDragging && this.distance < this.finishDistance)
         {
-            this.currentSpeed = 0
-            return
-        }
-
-        if (this.distance >= flatStart)
-        {
-            this.currentSpeed = this.experience.moving ? this.maxSpeed : 0
-        }
-        else if (this.experience.moving)
-        {
-            this.currentSpeed += this.acceleration
+            if (this.distance >= flatStart)
+            {
+                this.currentSpeed = this.experience.moving ? this.maxSpeed : 0
+            }
+            else if (this.experience.moving)
+            {
+                this.currentSpeed += this.acceleration
+            }
+            else
+            {
+                this.currentSpeed += this.deceleration
+            }
+            this.currentSpeed = Math.min(Math.max(this.currentSpeed, 0), this.maxSpeed)
+            this.distance += this.currentSpeed * this.time.delta * 0.0001
+            this.distance = Math.min(this.distance, this.finishDistance)
         }
         else
         {
-            this.currentSpeed += this.deceleration
+            this.currentSpeed = 0
         }
 
-        this.currentSpeed = Math.min(Math.max(this.currentSpeed, 0), this.maxSpeed)
-        this.distance += this.currentSpeed * this.time.delta * 0.0001
-        this.distance = Math.min(this.distance, this.finishDistance)
         this.material.uniforms.uTime.value = this.distance
-        // this.material.uniforms.uTime.value = this.experience.totalHoldTime * 0.0005 * Math.min(this.currentSpeed, this.maxSpeed)
-        // this.material.uniforms.uCarYRotation.value = -this.experience.world.car.model.rotation.y * (180 / Math.PI)
     }
 }

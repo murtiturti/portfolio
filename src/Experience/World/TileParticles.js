@@ -69,7 +69,7 @@ export default class TileParticles {
         deltaTime *= 0.001;
 
 
-        const emit = this.experience.world.terrain.currentSpeed >= (this.experience.world.terrain.maxSpeed * 0.2)
+        const emit = this.experience.state.speed >= (this.experience.state.maxSpeed * 0.2)
 
         // On emission start, stagger the pool so particles don't all spawn at once
         if (emit && !this.wasEmitting)
@@ -133,7 +133,7 @@ export default class TileParticles {
                     particle.rotation.x += deltaTime * 10
                     particle.rotation.y += deltaTime * 3
                     // Increase z velocity here
-                    particle.velocity.z += deltaTime * this.experience.world.terrain.currentSpeed
+                    particle.velocity.z += deltaTime * this.experience.state.speed
                     particle.velocity.y -= deltaTime * 9.8
                 }
             }

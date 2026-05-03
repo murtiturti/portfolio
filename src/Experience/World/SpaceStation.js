@@ -99,14 +99,14 @@ export default class SpaceStation
 
     update()
     {
-        const terrain = this.experience.world.terrain
+        const { distance: dist, finishDistance: fd, horizonIntensity: H } = this.experience.state
         const car = this.experience.world.car
 
-        const activationDistance = terrain.finishDistance * 0.43
-        const arrivalDistance = terrain.finishDistance * 0.47
+        const activationDistance = fd * 0.43
+        const arrivalDistance = fd * 0.47
         const targetZ = car.model.position.z - 15
 
-        const isActive = terrain.distance >= activationDistance
+        const isActive = dist >= activationDistance
         if (!isActive)
         {
             this.group.visible = false
@@ -115,11 +115,8 @@ export default class SpaceStation
         }
 
         // Normalized t from activation to arrival, then clamp at targetZ
-        const t = Math.max(0, Math.min(1, (terrain.distance - activationDistance) / (arrivalDistance - activationDistance)))
+        const t = Math.max(0, Math.min(1, (dist - activationDistance) / (arrivalDistance - activationDistance)))
         const baseZ = this.startZ + t * (targetZ - this.startZ)
-
-        const fd = terrain.finishDistance
-        const dist = terrain.distance
 
         // Pre-launch (0.47–0.50): engine glow + vibration
         const prelaunchT = Math.max(0, Math.min(1, (dist - fd * 0.47) / (fd * 0.03)))
@@ -154,7 +151,6 @@ export default class SpaceStation
         this.experience.camera.cameraExtraY = dist >= fd * 0.50 ? cameraExtraY : 0
 
         // Follow horizon curve — unclamped quadratic extends beyond terrain bounds
-        const H = terrain.uniforms.uHorizonLineIntensity.value
         let rx = 0
         if (baseZ < 0)
         {

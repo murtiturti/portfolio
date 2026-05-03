@@ -87,13 +87,11 @@ export default class Camera
         }
 
         const world = this.experience.world
-        if (!world?.car?.model || !world?.terrain) return
+        if (!world?.car?.model) return
 
-        const car     = world.car.model
-        const terrain = world.terrain
-
-        const s      = this.followSettings
-        const speedT = terrain.currentSpeed / terrain.maxSpeed
+        const car  = world.car.model
+        const s    = this.followSettings
+        const { speedT } = this.experience.state
         const distance = s.distanceMin + speedT * (s.distanceMax - s.distanceMin)
 
         const angle = car.rotation.y

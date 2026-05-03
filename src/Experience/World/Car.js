@@ -58,18 +58,16 @@ export default class Car
 
     update()
     {
-        const terrain = this.experience.world.terrain
-        this.totalMoveTime = terrain.distance
-        const curveFactor = 1 - terrain.flattenAmount
+        const { distance, flattenAmount, baseRoadElevation } = this.experience.state
+        this.totalMoveTime = distance
+        const curveFactor = 1 - flattenAmount
 
-        // Calculate derivative at point 0.5 (center of terrain uv)
         const rotationSampleDelta = 0.001
-
         const rotationSample0 = (Math.sin(0.3 * 0.5 + this.totalMoveTime) * Math.sin(0.1 * 0.5 + this.totalMoveTime)) * 3.0
         const rotationSample1 = (Math.sin(0.3 * 0.5 + this.totalMoveTime + rotationSampleDelta) * Math.sin(0.1 * 0.5 + this.totalMoveTime + rotationSampleDelta)) * 3.0
         const theta = Math.atan2(rotationSample1 - rotationSample0, rotationSampleDelta)
         this.model.rotation.y = theta * 0.1 * curveFactor
         this.model.position.x = 0 - (Math.sin(0.3 * 0.5 + this.totalMoveTime) * Math.sin(0.1 * 0.5 + this.totalMoveTime)) * 3.0 * curveFactor
-        this.model.position.y = this.baseY - terrain.baseRoadElevation * terrain.flattenAmount
+        this.model.position.y = this.baseY - baseRoadElevation * flattenAmount
     }
 }

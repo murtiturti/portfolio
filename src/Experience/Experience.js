@@ -61,6 +61,18 @@ export default class Experience
         skyMesh.renderOrder = -1
         this.scene.add(skyMesh)
         this.resources = new Resources(sources)
+        this.state = {
+            distance:         0,
+            finishDistance:   100,
+            progress:         0,
+            speed:            0,
+            maxSpeed:         15,
+            speedT:           0,
+            flattenAmount:    0,
+            isDragging:       false,
+            baseRoadElevation: -8,
+            horizonIntensity: 3.0,
+        }
         this.camera = new Camera()
         this.renderer = new Renderer()
         this.world = new World()
@@ -107,17 +119,33 @@ export default class Experience
 
     update()
     {
-        this.camera.update()
         this.world.update()
+        this._updateState()
+        this.camera.update()
         this.renderer.update()
         this._updateSky()
     }
 
+    _updateState()
+    {
+        const terrain = this.world?.terrain
+        if (!terrain) return
+
+        const s = this.state
+        s.distance          = terrain.distance
+        s.progress          = terrain.distance / terrain.finishDistance
+        s.speed             = terrain.currentSpeed
+        s.speedT            = terrain.currentSpeed / terrain.maxSpeed
+        s.flattenAmount     = terrain.flattenAmount
+        s.isDragging        = this.world?.progressSlider?.isDragging ?? false
+        s.baseRoadElevation = terrain.baseRoadElevation
+        s.horizonIntensity  = terrain.uniforms.uHorizonLineIntensity.value
+    }
+
     _updateSky()
     {
-        const fd   = this.world?.terrain?.finishDistance
-        const dist = this.world?.terrain?.distance
-        if (fd == null || dist == null) return
+        const { finishDistance: fd, distance: dist } = this.state
+        if (!fd) return
 
         const spaceT = Math.max(0, Math.min(1, (dist - fd * 0.50) / (fd * 0.015)))
         if (spaceT === this._lastSpaceT) return

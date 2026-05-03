@@ -76,12 +76,12 @@ export default class HintText
 
     update()
     {
-        const terrain = this.experience.world.terrain
+        const { distance } = this.experience.state
         const elapsed = this.experience.time.elapsed * 0.001   // seconds
 
-        const z = -15 + (terrain.distance - this.spawnDistance) * 8
+        const z = -15 + (distance - this.spawnDistance) * 8
 
-        if (terrain.distance < this.spawnDistance || z >= 24)
+        if (distance < this.spawnDistance || z >= 24)
         {
             this.mesh.visible = false
             return
