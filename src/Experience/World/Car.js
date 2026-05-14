@@ -1,6 +1,9 @@
 import * as THREE from 'three'
 import Experience from '../Experience'
 
+export const CAR_BASE_Y = -7
+export const CAR_TIRE_X_OFFSET = 1.25
+
 export default class Car
 {
     constructor()
@@ -29,7 +32,7 @@ export default class Car
     {
         this.model = this.resource.scene
         this.model.scale.setScalar(1.0)
-        this.model.position.y = -7
+        this.model.position.y = CAR_BASE_Y
         this.baseY = this.model.position.y
         this.scene.add(this.model)
 

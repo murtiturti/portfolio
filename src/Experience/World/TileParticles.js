@@ -1,7 +1,10 @@
 import * as THREE from 'three';
 import Experience from '../Experience';
+import { CAR_BASE_Y, CAR_TIRE_X_OFFSET } from './Car';
 import tileVertexShader from '../../shaders/tiles/vertex.glsl';
 import tileFragmentShader from '../../shaders/tiles/fragment.glsl';
+
+const SPAWN_Y = CAR_BASE_Y - 0.5
 
 export default class TileParticles {
     constructor(maxCount, right) {
@@ -37,7 +40,7 @@ export default class TileParticles {
             const spawnTime = i * this.spawnInterval;
             const particle = {
                 // Define the spawn position.
-                position: new THREE.Vector3(0, -7.2, 3.1),
+                position: new THREE.Vector3(0, SPAWN_Y, 3.1),
                 rotation: new THREE.Euler(0, 0, 90),
                 // Start off hidden.
                 scale: new THREE.Vector3(0, 0, 0),
@@ -105,8 +108,8 @@ export default class TileParticles {
                 particle.active = true;
                 particle.life = 0;
                 // Reset position to spawn point.
-                const tirePosition = carModel.position.x + (1.25 * this.right)
-                particle.position.set(tirePosition + (Math.random() - 0.5) * 0.125, -7.5, 3.1);
+                const tirePosition = carModel.position.x + (CAR_TIRE_X_OFFSET * this.right)
+                particle.position.set(tirePosition + (Math.random() - 0.5) * 0.125, SPAWN_Y, 3.1);
                 // Make it visible.
                 particle.scale.set(Math.random() * 0.5 + 0.1, Math.random() * 0.5 + 0.1, Math.random() * 0.5 + 0.1);
                 // Reset particle velocity
