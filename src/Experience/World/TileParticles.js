@@ -4,7 +4,17 @@ import { CAR_BASE_Y, CAR_TIRE_X_OFFSET } from './Car';
 import tileVertexShader from '../../shaders/tiles/vertex.glsl';
 import tileFragmentShader from '../../shaders/tiles/fragment.glsl';
 
+const SPAWN_RATE = 10
+const PARTICLE_LIFETIME = 1.2
 const SPAWN_Y = CAR_BASE_Y - 0.5
+const PARTICLE_SPAWN_Z = 3.1
+const VEL_X_RANGE = 3
+const VEL_Y_BASE = 5
+const VEL_Y_VAR = 5
+const VEL_Z_BASE = 10
+const VEL_Z_VAR = 3
+const GRAVITY = 9.8
+const EMIT_SPEED_THRESHOLD = 0.2  // fraction of maxSpeed
 
 export default class TileParticles {
     constructor(maxCount, right) {
@@ -12,9 +22,9 @@ export default class TileParticles {
         this.maxCount = maxCount;
 
         // Spawning and lifetime parameters:
-        this.spawnRate = 10;              // Number of particles to spawn per second.
+        this.spawnRate = SPAWN_RATE;             // Number of particles to spawn per second.
         this.spawnInterval = 1 / this.spawnRate; // Time interval (seconds) between spawns.
-        this.lifetime = 1.2;              // Lifetime (in seconds) of each particle.
+        this.lifetime = PARTICLE_LIFETIME;       // Lifetime (in seconds) of each particle.
         this.elapsedTime = 0;             // Global elapsed time tracker.
         this.wasEmitting = false;
         this.right = right
@@ -40,11 +50,11 @@ export default class TileParticles {
             const spawnTime = i * this.spawnInterval;
             const particle = {
                 // Define the spawn position.
-                position: new THREE.Vector3(0, SPAWN_Y, 3.1),
+                position: new THREE.Vector3(0, SPAWN_Y, PARTICLE_SPAWN_Z),
                 rotation: new THREE.Euler(0, 0, 90),
                 // Start off hidden.
                 scale: new THREE.Vector3(0, 0, 0),
-                velocity: new THREE.Vector3((Math.random() - 0.5) * 3, 5 + Math.random() * 5, 10 + Math.random() * 3),
+                velocity: new THREE.Vector3((Math.random() - 0.5) * VEL_X_RANGE, VEL_Y_BASE + Math.random() * VEL_Y_VAR, VEL_Z_BASE + Math.random() * VEL_Z_VAR),
                 life: 0,           // Time (seconds) particle has been active.
                 active: false,     // Is the particle spawned/active?
                 spawnTime: spawnTime, // When to spawn this particle.
@@ -72,7 +82,7 @@ export default class TileParticles {
         deltaTime *= 0.001;
 
 
-        const emit = this.experience.state.speed >= (this.experience.state.maxSpeed * 0.2)
+        const emit = this.experience.state.speed >= (this.experience.state.maxSpeed * EMIT_SPEED_THRESHOLD)
 
         // On emission start, stagger the pool so particles don't all spawn at once
         if (emit && !this.wasEmitting)
@@ -109,11 +119,11 @@ export default class TileParticles {
                 particle.life = 0;
                 // Reset position to spawn point.
                 const tirePosition = carModel.position.x + (CAR_TIRE_X_OFFSET * this.right)
-                particle.position.set(tirePosition + (Math.random() - 0.5) * 0.125, SPAWN_Y, 3.1);
+                particle.position.set(tirePosition + (Math.random() - 0.5) * 0.125, SPAWN_Y, PARTICLE_SPAWN_Z);
                 // Make it visible.
                 particle.scale.set(Math.random() * 0.5 + 0.1, Math.random() * 0.5 + 0.1, Math.random() * 0.5 + 0.1);
                 // Reset particle velocity
-                particle.velocity.set((Math.random() - 0.5) * 3, 5 + Math.random() * 5, 10 + Math.random() * 3)
+                particle.velocity.set((Math.random() - 0.5) * VEL_X_RANGE, VEL_Y_BASE + Math.random() * VEL_Y_VAR, VEL_Z_BASE + Math.random() * VEL_Z_VAR)
                 // Reset particle rotation
                 particle.rotation.set(0, 0, 90)
             }
@@ -137,7 +147,7 @@ export default class TileParticles {
                     particle.rotation.y += deltaTime * 3
                     // Increase z velocity here
                     particle.velocity.z += deltaTime * this.experience.state.speed
-                    particle.velocity.y -= deltaTime * 9.8
+                    particle.velocity.y -= deltaTime * GRAVITY
                 }
             }
 

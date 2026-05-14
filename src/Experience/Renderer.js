@@ -1,6 +1,8 @@
 import * as THREE from 'three'
 import Experience from "./Experience";
 
+const TONE_MAPPING_EXPOSURE = 1.75
+
 export default class Renderer
 {
     constructor()
@@ -21,7 +23,7 @@ export default class Renderer
             antialias: true
         })
         this.instance.toneMapping = THREE.CineonToneMapping
-        this.instance.toneMappingExposure = 1.75
+        this.instance.toneMappingExposure = TONE_MAPPING_EXPOSURE
         this.instance.shadowMap.enabled = true
         this.instance.shadowMap.type = THREE.PCFSoftShadowMap
         this.instance.setClearColor('#211d20')

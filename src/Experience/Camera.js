@@ -2,6 +2,8 @@ import * as THREE from 'three'
 import Experience from "./Experience";
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
 
+const ROCKET_FOLLOW_SETTINGS = { distance: 12, height: -4, lookAheadY: 8, lerp: 0.05 }
+
 export default class Camera
 {
     constructor()
@@ -17,7 +19,7 @@ export default class Camera
         this._rocketWorldPos = new THREE.Vector3()
 
         this.rocketTarget   = null
-        this.rocketSettings = { distance: 12, height: -4, lookAheadY: 8, lerp: 0.05 }
+        this.rocketSettings = ROCKET_FOLLOW_SETTINGS
         this.cameraExtraY   = 0
 
         // Follow camera settings

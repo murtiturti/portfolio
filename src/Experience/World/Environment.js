@@ -1,7 +1,16 @@
 import * as THREE from 'three'
 import Experience from "../Experience";
 
-export default class Environment 
+const SUNLIGHT = {
+    intensity: 4,
+    position: [3.5, 2, -1.25],
+    shadowFar: 15,
+    shadowMapSize: 1024,
+    shadowNormalBias: 0.05,
+}
+const ENV_MAP_INTENSITY = 0.4
+
+export default class Environment
 {
     constructor() 
     {
@@ -21,12 +30,12 @@ export default class Environment
 
     setSunLight()
     {
-        this.sunLight = new THREE.DirectionalLight('#ffffff', 4)
+        this.sunLight = new THREE.DirectionalLight('#ffffff', SUNLIGHT.intensity)
         this.sunLight.castShadow = true
-        this.sunLight.shadow.camera.far = 15
-        this.sunLight.shadow.mapSize.set(1024, 1024)
-        this.sunLight.shadow.normalBias = 0.05
-        this.sunLight.position.set(3.5, 2, - 1.25)
+        this.sunLight.shadow.camera.far = SUNLIGHT.shadowFar
+        this.sunLight.shadow.mapSize.set(SUNLIGHT.shadowMapSize, SUNLIGHT.shadowMapSize)
+        this.sunLight.shadow.normalBias = SUNLIGHT.shadowNormalBias
+        this.sunLight.position.set(...SUNLIGHT.position)
         this.scene.add(this.sunLight)
 
         // Debug
@@ -40,7 +49,7 @@ export default class Environment
     setEnvironmentMap()
     {
         this.environmentMap = {}
-        this.environmentMap.intensity = 0.4
+        this.environmentMap.intensity = ENV_MAP_INTENSITY
         this.environmentMap.texture = this.resources.items.environmentMapTexture
         this.environmentMap.texture.colorSpace = THREE.SRGBColorSpace
 

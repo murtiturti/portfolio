@@ -1,5 +1,10 @@
 import * as THREE from 'three'
 
+const DEFAULT_SPEED = 1
+const DEFAULT_DIRECTION = new THREE.Vector3(0, 0.2, 1)
+const DEFAULT_LIFETIME = 2
+const DEFAULT_RATE = 2  // particles per second
+
 export default class ParticleEmitter
 {
     constructor({particles, position, time})
@@ -10,8 +15,8 @@ export default class ParticleEmitter
         this.points = new THREE.Points(this.geometry, this.material) // ADD TO SCENE
 
         // Particle anim data
-        this.speed = 1
-        this.direction = new THREE.Vector3(0, 0.2, 1)
+        this.speed = DEFAULT_SPEED
+        this.direction = DEFAULT_DIRECTION.clone()
 
         this.particles = particles
 
@@ -19,9 +24,9 @@ export default class ParticleEmitter
         this.position = position
         this.maxParticleCount = this.particles.maxCount
         this.currentParticleCount = 0
-        this.particleLifeTime = 2
+        this.particleLifeTime = DEFAULT_LIFETIME
         this.lastEmissionTime = 0
-        this.rate = 2 // 2 tiles per second
+        this.rate = DEFAULT_RATE
         this.time = time
     }
 
