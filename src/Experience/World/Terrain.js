@@ -23,7 +23,7 @@ export default class Terrain
             uValleyDepth: new THREE.Uniform(27.8),
             uCarYRotation: new THREE.Uniform(0),
             uDistance: new THREE.Uniform(0),
-            uHorizonLineIntensity: new THREE.Uniform(3.0)
+            uHorizonLineIntensity: new THREE.Uniform(this.experience.state.horizonIntensity)
         }
 
         this.distance = 0
