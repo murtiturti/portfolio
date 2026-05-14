@@ -4,6 +4,15 @@ import timeline from '../timeline.js'
 import { SUN_POSITION } from './Sun.js'
 
 const PHASE1_HEIGHT = 60  // rocket Y at end of phase 1 (world units)
+const STATION_START_Z = -80
+const ROCKET_PAD_Y = 0.7
+const STATION_TARGET_Z_OFFSET = -15
+const ENGINE_LIGHT_PEAK = 8
+const PRELAUNCH_VIBRATION = 0.3
+const HORIZON_CURVE_DENOM_Z = 32
+const HORIZON_CURVE_DENOM_SLOPE = 512
+const STATION_SINK_DEPTH = 0.39
+const CAMERA_SCROLL_SPEED = 3
 
 export default class SpaceStation
 {
@@ -12,7 +21,7 @@ export default class SpaceStation
         this.experience = new Experience()
         this.scene = this.experience.scene
 
-        this.startZ = -80
+        this.startZ = STATION_START_Z
 
         this.group = new THREE.Group()
         this.group.position.set(0, 0, this.startZ)
@@ -59,7 +68,7 @@ export default class SpaceStation
     {
         this.rocketGroup = new THREE.Group()
         const rocketGroup = this.rocketGroup
-        rocketGroup.position.y = 0.7  // sit on pad
+        rocketGroup.position.y = ROCKET_PAD_Y  // sit on pad
 
         this.engineLight = new THREE.PointLight(0xff6600, 0, 12)
         this.engineLight.position.y = -1
@@ -109,7 +118,7 @@ export default class SpaceStation
 
         const activationDistance = fd * t.activate
         const arrivalDistance = fd * t.arrive
-        const targetZ = car.model.position.z - 15
+        const targetZ = car.model.position.z + STATION_TARGET_Z_OFFSET
 
         const isActive = dist >= activationDistance
         if (!isActive)
@@ -126,10 +135,10 @@ export default class SpaceStation
         // Prelaunch: arrive → launch (engine glow + vibration)
         const prelaunchDuration = fd * (t.launch - t.arrive)
         const prelaunchT = Math.max(0, Math.min(1, (dist - fd * t.arrive) / prelaunchDuration))
-        this.engineLight.intensity = prelaunchT * 8
+        this.engineLight.intensity = prelaunchT * ENGINE_LIGHT_PEAK
         if (prelaunchT > 0 && prelaunchT < 1)
         {
-            this.rocketGroup.position.x = (Math.random() - 0.5) * 0.3 * prelaunchT
+            this.rocketGroup.position.x = (Math.random() - 0.5) * PRELAUNCH_VIBRATION * prelaunchT
         }
         else
         {
@@ -143,27 +152,26 @@ export default class SpaceStation
         // Phase 2: constant speed matching derivative at end of phase 1 (C¹-continuous)
         const phase2Speed = 2 * PHASE1_HEIGHT / phase1Duration
         const rocketPhase2Y = dist > fd * t.phase2 ? (dist - fd * t.phase2) * phase2Speed : 0
-        this.rocketGroup.position.y = 0.7 + rocketPhase1Y + rocketPhase2Y
+        this.rocketGroup.position.y = ROCKET_PAD_Y + rocketPhase1Y + rocketPhase2Y
 
         // easedLaunch for group tilt: based on phase1T only (fully straight by phase2)
         const easedLaunch = phase1T * phase1T
 
         // Camera: tracks rocket Y during launch→phase2, then gentle scroll until cameraFollowEnd
-        const cameraScrollSpeed = 3
         const cameraScrollDuration = fd * (t.cameraFollowEnd - t.phase2)
         const cameraPhase2 = Math.min(Math.max(0, dist - fd * t.phase2), cameraScrollDuration)
         const cameraExtraY = phase1T < 1
             ? rocketPhase1Y
-            : PHASE1_HEIGHT + cameraPhase2 * cameraScrollSpeed
+            : PHASE1_HEIGHT + cameraPhase2 * CAMERA_SCROLL_SPEED
         this.experience.camera.cameraExtraY = dist >= fd * t.launch ? cameraExtraY : 0
 
         // Follow horizon curve — unclamped quadratic extends beyond terrain bounds
         let rx = 0
         if (baseZ < 0)
         {
-            const diff = -baseZ / 32
+            const diff = -baseZ / HORIZON_CURVE_DENOM_Z
             this.group.position.y = -(diff * diff * H)
-            const slope = -H * baseZ / 512  // dy/dz at this z
+            const slope = -H * baseZ / HORIZON_CURVE_DENOM_SLOPE  // dy/dz at this z
             rx = Math.atan2(-slope, 1)
         }
         else
@@ -174,9 +182,9 @@ export default class SpaceStation
         // Straighten group tilt as rocket launches
         this.group.rotation.x = rx * (1 - easedLaunch)
 
-        // Sink 0.39 units along local -Y (surface normal) to hide base underside
-        this.group.position.y -= Math.cos(rx) * 0.39
-        this.group.position.z = baseZ - Math.sin(rx) * 0.39
+        // Sink along local -Y (surface normal) to hide base underside
+        this.group.position.y -= Math.cos(rx) * STATION_SINK_DEPTH
+        this.group.position.z = baseZ - Math.sin(rx) * STATION_SINK_DEPTH
 
         // Only show once past the sun
         this.group.visible = this.group.position.z > SUN_POSITION.z
