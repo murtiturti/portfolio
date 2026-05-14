@@ -40,7 +40,15 @@ export default class World
 
             this.particlesRight = new TileParticles(80, 1)
             this.particlesLeft = new TileParticles(80, -1)
-            // this.scene.add(this.particles)
+
+            // Group the car and its particles so they share a transform
+            // (e.g. car rises with the terrain flatten and particles follow).
+            // attach() preserves each child's world transform during reparent.
+            this.carGroup = new THREE.Group()
+            this.scene.add(this.carGroup)
+            this.carGroup.attach(this.car.model)
+            this.carGroup.attach(this.particlesRight.instancedMesh)
+            this.carGroup.attach(this.particlesLeft.instancedMesh)
 
             this.progressSlider = new ProgressSlider()
             this.spaceStation = new SpaceStation()
@@ -53,7 +61,7 @@ export default class World
         })
     }
 
-    update() 
+    update()
     {
         if (this.fox)
         {
@@ -71,6 +79,11 @@ export default class World
         if (this.car)
         {
             this.car.update()
+        }
+        if (this.carGroup)
+        {
+            const { flattenAmount, baseRoadElevation } = this.experience.state
+            this.carGroup.position.y = -baseRoadElevation * flattenAmount
         }
         if (this.particlesRight && this.particlesLeft)
         {

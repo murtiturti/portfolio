@@ -17,6 +17,7 @@ export default class Camera
         this._targetPos      = new THREE.Vector3()
         this._lookAt         = new THREE.Vector3()
         this._rocketWorldPos = new THREE.Vector3()
+        this._carWorldPos    = new THREE.Vector3()
 
         this.rocketTarget   = null
         this.rocketSettings = ROCKET_FOLLOW_SETTINGS
@@ -96,23 +97,24 @@ export default class Camera
         const { speedT } = this.experience.state
         const distance = s.distanceMin + speedT * (s.distanceMax - s.distanceMin)
 
+        const carPos = car.getWorldPosition(this._carWorldPos)
         const angle = car.rotation.y
         this._targetPos.set(
-            car.position.x + Math.sin(angle) * distance,
-            car.position.y + s.height,
-            car.position.z + Math.cos(angle) * distance
+            carPos.x + Math.sin(angle) * distance,
+            carPos.y + s.height,
+            carPos.z + Math.cos(angle) * distance
         )
 
-        this._targetPos.y = car.position.y + s.height + this.cameraExtraY
+        this._targetPos.y = carPos.y + s.height + this.cameraExtraY
 
         this.instance.position.lerp(this._targetPos, s.lerp)
 
         if (this.cameraExtraY === 0)
         {
             this._lookAt.set(
-                car.position.x - Math.sin(angle) * s.lookAhead,
-                car.position.y + s.lookAheadY,
-                car.position.z - Math.cos(angle) * s.lookAhead
+                carPos.x - Math.sin(angle) * s.lookAhead,
+                carPos.y + s.lookAheadY,
+                carPos.z - Math.cos(angle) * s.lookAhead
             )
             this.instance.lookAt(this._lookAt)
         }

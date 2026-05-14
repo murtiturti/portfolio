@@ -61,7 +61,7 @@ export default class Car
 
     update()
     {
-        const { distance, flattenAmount, baseRoadElevation } = this.experience.state
+        const { distance, flattenAmount } = this.experience.state
         this.totalMoveTime = distance
         const curveFactor = 1 - flattenAmount
 
@@ -71,6 +71,5 @@ export default class Car
         const theta = Math.atan2(rotationSample1 - rotationSample0, rotationSampleDelta)
         this.model.rotation.y = theta * 0.1 * curveFactor
         this.model.position.x = 0 - (Math.sin(0.3 * 0.5 + this.totalMoveTime) * Math.sin(0.1 * 0.5 + this.totalMoveTime)) * 3.0 * curveFactor
-        this.model.position.y = this.baseY - baseRoadElevation * flattenAmount
     }
 }
