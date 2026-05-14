@@ -4,7 +4,16 @@ import timeline from '../timeline.js'
 import terrainVertexShader from '../../shaders/terrain/vertex.glsl'
 import terrainFragmentShader from '../../shaders/terrain/fragment.glsl'
 
-export default class Terrain 
+const ACCELERATION = 0.0095
+const DECELERATION = -0.05
+const DEFAULT_HILL_ELEVATION = 8.45
+const DEFAULT_HILL_FREQUENCY = new THREE.Vector2(0.145, 0.084)
+const DEFAULT_ROAD_ELEVATION = -8
+const DEFAULT_VALLEY_DEPTH = 27.8
+const TERRAIN_SIZE = 64
+const TERRAIN_SEGMENTS = 128
+
+export default class Terrain
 {
     constructor()
     {
@@ -13,14 +22,14 @@ export default class Terrain
         this.resources = this.experience.resources
         this.debug = this.experience.debug
         this.time = this.experience.time
-        this.uniforms = 
+        this.uniforms =
         {
-            uBigHillElevation: new THREE.Uniform(8.45),
-            uBigHillFrequency: new THREE.Uniform(new THREE.Vector2(0.145, 0.084)),
+            uBigHillElevation: new THREE.Uniform(DEFAULT_HILL_ELEVATION),
+            uBigHillFrequency: new THREE.Uniform(DEFAULT_HILL_FREQUENCY.clone()),
             uColor: new THREE.Uniform(new THREE.Color('#00ff00')),
             uTime: new THREE.Uniform(0),
-            uRoadElevation: new THREE.Uniform(-8),
-            uValleyDepth: new THREE.Uniform(27.8),
+            uRoadElevation: new THREE.Uniform(DEFAULT_ROAD_ELEVATION),
+            uValleyDepth: new THREE.Uniform(DEFAULT_VALLEY_DEPTH),
             uCarYRotation: new THREE.Uniform(0),
             uDistance: new THREE.Uniform(0),
             uHorizonLineIntensity: new THREE.Uniform(this.experience.state.horizonIntensity)
@@ -34,8 +43,8 @@ export default class Terrain
 
         this.maxSpeed = this.experience.state.maxSpeed
         this.currentSpeed = 0
-        this.acceleration = 0.0095
-        this.deceleration = -0.05
+        this.acceleration = ACCELERATION
+        this.deceleration = DECELERATION
 
         if (this.debug.active)
         {
@@ -50,7 +59,7 @@ export default class Terrain
 
     setGeometry()
     {
-        this.geometry = new THREE.PlaneGeometry(64, 64, 128, 128)
+        this.geometry = new THREE.PlaneGeometry(TERRAIN_SIZE, TERRAIN_SIZE, TERRAIN_SEGMENTS, TERRAIN_SEGMENTS)
     }
 
     setTextures()
