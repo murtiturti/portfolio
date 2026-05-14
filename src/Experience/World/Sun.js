@@ -4,6 +4,9 @@ import sunVertexShader from '../../shaders/sun/vertex.glsl'
 import sunFragmentShader from '../../shaders/sun/fragment.glsl'
 import GradientTexture from '../Utils/GradientTexture'
 
+export const SUN_POSITION = new THREE.Vector3(-1, -6, -65)
+export const SUN_ROTATION = new THREE.Euler(Math.PI, 0, 0)
+
 export default class Sun
 {
     constructor()
@@ -78,8 +81,8 @@ export default class Sun
     setMesh()
     {
         this.mesh = new THREE.Mesh(this.geometry, this.material)
-        this.mesh.position.set(-1, -6, -65)
-        this.mesh.rotation.set(Math.PI, 0, 0)
+        this.mesh.position.copy(SUN_POSITION)
+        this.mesh.rotation.copy(SUN_ROTATION)
         this.mesh.receiveShadow = false
         this.scene.add(this.mesh)
     }

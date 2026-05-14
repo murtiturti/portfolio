@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import Experience from '../Experience'
 import timeline from '../timeline.js'
+import { SUN_POSITION } from './Sun.js'
 
 const PHASE1_HEIGHT = 60  // rocket Y at end of phase 1 (world units)
 
@@ -178,6 +179,6 @@ export default class SpaceStation
         this.group.position.z = baseZ - Math.sin(rx) * 0.39
 
         // Only show once past the sun
-        this.group.visible = this.group.position.z > -65
+        this.group.visible = this.group.position.z > SUN_POSITION.z
     }
 }

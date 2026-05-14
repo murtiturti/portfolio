@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import Experience from '../Experience.js'
+import { SUN_POSITION, SUN_ROTATION } from './Sun.js'
 import sunVertexShader from '../../shaders/sunOuter/vertex.glsl'
 import sunFragmentShader from '../../shaders/sunOuter/fragment.glsl'
 
@@ -47,8 +48,8 @@ export default class SunOuter
     {
         this.mesh = new THREE.Mesh(this.geometry, this.material)
         this.mesh.scale.setScalar(1.07);
-        this.mesh.position.set(-1, -6, -65)
-        this.mesh.rotation.set(Math.PI, 0, 0)
+        this.mesh.position.copy(SUN_POSITION)
+        this.mesh.rotation.copy(SUN_ROTATION)
         this.mesh.receiveShadow = false
         this.scene.add(this.mesh)
     }
