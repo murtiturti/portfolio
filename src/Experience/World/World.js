@@ -10,7 +10,9 @@ import ProgressSlider from "../Utils/ProgressSlider.js";
 import SpaceStation from "./SpaceStation.js";
 import ResumeScroll from "./ResumeScroll.js";
 import HintText from "./HintText.js";
+import Billboard from "./Billboard.js";
 import timeline from "../timeline.js";
+import resumeData from "../../data/resume.json";
 import * as THREE from 'three'
 
 export default class World
@@ -42,6 +44,17 @@ export default class World
             ]
             this.hintTexts = hintSpecs.map(([text, key]) => new HintText(text, fd * key))
 
+            // Billboards: one per project entry with a `media` field in resume.json.
+            // spawnDistance is computed by even spacing across the billboards window,
+            // with a one-slot buffer at each edge so they don't slam into adjacent sections.
+            const mediaProjects = resumeData.projects.filter(p => p.media)
+            const { start, end } = timeline.billboards
+            this.billboards = mediaProjects.map((p, i) => {
+                const t = (i + 1) / (mediaProjects.length + 1)
+                const spawnDistance = fd * (start + t * (end - start))
+                return new Billboard(p.media, spawnDistance)
+            })
+
             // Group the car and its particles so they share a transform.
             // attach() preserves each child's world transform during reparent.
             this.carGroup = new THREE.Group()
@@ -68,6 +81,7 @@ export default class World
                 this.spaceStation,
                 this.resumeScroll,
                 ...this.hintTexts,
+                ...this.billboards,
             ]
         })
     }
