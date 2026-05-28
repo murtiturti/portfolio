@@ -54,10 +54,4 @@ export default class SunOuter
         this.scene.add(this.mesh)
     }
 
-    update()
-    {
-        this.material.uniforms.uTime.value += this.experience.time.delta
-    }
-
-
 }
