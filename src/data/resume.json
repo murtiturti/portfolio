@@ -27,12 +27,14 @@
     {
       "name": "Synthwave Portfolio",
       "description": "Interactive 3D driving experience built with Three.js. Procedural terrain, particle systems, and a full narrative arc.",
-      "url": ""
+      "url": "",
+      "media": "videos/synthwave.webm"
     },
     {
       "name": "Project Two",
       "description": "A description of another notable project goes here. Replace with your real projects.",
-      "url": "https://github.com/example"
+      "url": "https://github.com/example",
+      "media": "videos/project-two.webm"
     }
   ]
 }
