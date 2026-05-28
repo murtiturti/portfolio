@@ -54,10 +54,13 @@ export default class World
             this.spaceStation = new SpaceStation()
             this.resumeScroll = new ResumeScroll()
             const fd = this.terrain.finishDistance
-            this.hintText  = new HintText('press and hold anywhere to move',          fd * timeline.hints.move)
-            this.hintText2 = new HintText('use the slider to fast forward or rewind', fd * timeline.hints.slider)
-            this.hintText3 = new HintText('check my profiles from the links',         fd * timeline.hints.links)
-            this.hintText4 = new HintText('stay tuned for my resume',                 fd * timeline.hints.resume)
+            const hintSpecs = [
+                ['press and hold anywhere to move',          timeline.hints.move],
+                ['use the slider to fast forward or rewind', timeline.hints.slider],
+                ['check my profiles from the links',         timeline.hints.links],
+                ['stay tuned for my resume',                 timeline.hints.resume],
+            ]
+            this.hintTexts = hintSpecs.map(([text, key]) => new HintText(text, fd * key))
         })
     }
 
@@ -102,21 +105,9 @@ export default class World
         {
             this.resumeScroll.update()
         }
-        if (this.hintText)
+        if (this.hintTexts)
         {
-            this.hintText.update()
-        }
-        if (this.hintText2)
-        {
-            this.hintText2.update()
-        }
-        if (this.hintText3)
-        {
-            this.hintText3.update()
-        }
-        if (this.hintText4)
-        {
-            this.hintText4.update()
+            for (const h of this.hintTexts) h.update()
         }
     }
 }
