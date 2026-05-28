@@ -71,6 +71,7 @@ export default class Experience
             speedT:           0,
             flattenAmount:    0,
             isDragging:       false,
+            moving:           false,
             baseRoadElevation: -8,
             horizonIntensity: 3.0,
         }
@@ -120,8 +121,8 @@ export default class Experience
 
     update()
     {
-        this.world.update()
         this._updateState()
+        this.world.update()
         this.camera.update()
         this.renderer.update()
         this._updateSky()
@@ -129,16 +130,18 @@ export default class Experience
 
     _updateState()
     {
+        const s = this.state
+        s.isDragging = this.world?.progressSlider?.isDragging ?? false
+        s.moving     = this.moving ?? false
+
         const terrain = this.world?.terrain
         if (!terrain) return
 
-        const s = this.state
         s.distance          = terrain.distance
         s.progress          = terrain.distance / terrain.finishDistance
         s.speed             = terrain.currentSpeed
         s.speedT            = terrain.currentSpeed / terrain.maxSpeed
         s.flattenAmount     = terrain.flattenAmount
-        s.isDragging        = this.world?.progressSlider?.isDragging ?? false
         s.baseRoadElevation = terrain.baseRoadElevation
         s.horizonIntensity  = terrain.uniforms.uHorizonLineIntensity.value
     }
