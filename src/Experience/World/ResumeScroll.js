@@ -3,11 +3,23 @@ import Experience from '../Experience'
 import timeline from '../timeline.js'
 import resumeData from '../../data/resume.json'
 
-const CANVAS_W     = 1400   // fixed canvas px width (text resolution)
-const GAP          = 0.8    // world-unit gap between cards
-const CARD_Z       = 0
+const CANVAS_W      = 1400  // fixed canvas px width (text resolution)
+const GAP           = 0.8   // world-unit gap between cards
+const CARD_Z        = 0
 const GROUP_START_Y = 100
 const SCROLL_SPEED  = 1.5
+
+const CARD_W_MAX      = 14   // world-unit cap on card width
+const CARD_W_VIS_FRAC = 0.82 // fraction of visible width to fill at min camera distance
+
+const CARD_HEIGHT_PX = {
+    projectLinked:  420, // project card with clickable URL
+    project:        320, // project card without URL
+    experienceBase: 200, // experience card baseline (per-bullet height added)
+    bullet:          90, // height contribution per bullet line
+    header:         350,
+    sectionLabel:   110,
+}
 
 export default class ResumeScroll
 {
@@ -19,10 +31,11 @@ export default class ResumeScroll
         // Card width derived from what's actually visible at the camera's minimum
         // follow distance (worst case — slow speed) with a safe margin.
         const { width, height } = this.experience.sizes
-        const d = this.experience.camera.followSettings.distanceMin  // 20 wu
-        const visH = 2 * Math.tan((35 * Math.PI / 180) / 2) * d     // visible height at d
+        const d = this.experience.camera.followSettings.distanceMin
+        const fov = this.experience.camera.instance.fov
+        const visH = 2 * Math.tan((fov * Math.PI / 180) / 2) * d
         const visW = visH * (width / height)
-        this._cardW = Math.min(14, visW * 0.82)
+        this._cardW = Math.min(CARD_W_MAX, visW * CARD_W_VIS_FRAC)
 
         this.group = new THREE.Group()
         this.group.position.set(0, GROUP_START_Y, CARD_Z)
@@ -59,7 +72,7 @@ export default class ResumeScroll
         // Projects cards first (seen last), then label (seen before its cards)
         for (const proj of resumeData.projects)
         {
-            const canvasH = proj.url ? 420 : 320
+            const canvasH = proj.url ? CARD_HEIGHT_PX.projectLinked : CARD_HEIGHT_PX.project
             const h = this._wu(canvasH)
             const card = this._mesh(this._canvasProject(proj, canvasH), h)
             yBottom = this._place(card, h, yBottom)
@@ -71,7 +84,7 @@ export default class ResumeScroll
         // Experience cards, then label
         for (const exp of resumeData.experiences)
         {
-            const canvasH = 200 + exp.bullets.length * 90
+            const canvasH = CARD_HEIGHT_PX.experienceBase + exp.bullets.length * CARD_HEIGHT_PX.bullet
             const h = this._wu(canvasH)
             yBottom = this._place(this._mesh(this._canvasExperience(exp, canvasH), h), h, yBottom)
         }
@@ -79,13 +92,13 @@ export default class ResumeScroll
         yBottom -= GAP * 0.5
 
         // Header spawned last = seen first
-        const headerH = this._wu(350)
+        const headerH = this._wu(CARD_HEIGHT_PX.header)
         this._place(this._mesh(this._canvasHeader(), headerH), headerH, yBottom)
     }
 
     _sectionLabel(text, color, yBottom)
     {
-        const canvasH = 110
+        const canvasH = CARD_HEIGHT_PX.sectionLabel
         const h = this._wu(canvasH)
         const canvas = document.createElement('canvas')
         canvas.width = CANVAS_W; canvas.height = canvasH
@@ -101,7 +114,7 @@ export default class ResumeScroll
 
     _canvasHeader()
     {
-        const H = 350
+        const H = CARD_HEIGHT_PX.header
         const canvas = document.createElement('canvas')
         canvas.width = CANVAS_W; canvas.height = H
         const ctx = canvas.getContext('2d')
@@ -152,7 +165,7 @@ export default class ResumeScroll
         ctx.fillStyle = '#ccccee'
         ctx.font = '38px monospace'
         exp.bullets.forEach((b, i) => {
-            ctx.fillText('▸ ' + b, 50, 210 + i * 90)
+            ctx.fillText('▸ ' + b, 50, 210 + i * CARD_HEIGHT_PX.bullet)
         })
 
         return canvas
