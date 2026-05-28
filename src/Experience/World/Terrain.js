@@ -143,15 +143,15 @@ export default class Terrain
         this.uniforms.uBigHillElevation.value = this.baseHillElevation * (1 - this.flattenAmount)
         this.uniforms.uRoadElevation.value  = this.baseRoadElevation  * (1 - this.flattenAmount)
 
-        const isDragging = this.experience.world?.progressSlider?.isDragging ?? false
+        const { isDragging, moving } = this.experience.state
 
         if (!isDragging && this.distance < this.finishDistance)
         {
             if (this.distance >= flatEnd)
             {
-                this.currentSpeed = this.experience.moving ? this.maxSpeed : 0
+                this.currentSpeed = moving ? this.maxSpeed : 0
             }
-            else if (this.experience.moving)
+            else if (moving)
             {
                 this.currentSpeed += this.acceleration
             }
