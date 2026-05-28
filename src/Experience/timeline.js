@@ -3,9 +3,13 @@
 export default {
     hints: {
         move:   0.00,  // "press and hold anywhere to move"
-        slider: 0.10,  // "use the slider to fast forward or rewind"
-        links:  0.30,  // "check my profiles from the links"
-        resume: 0.40,  // "stay tuned for my resume"
+        slider: 0.06,  // "use the slider to fast forward or rewind"
+        links:  0.12,  // "check my profiles from the links"
+        resume: 0.18,  // "stay tuned for my resume"
+    },
+    billboards: {
+        start: 0.23,   // first billboard begins fading in
+        end:   0.43,   // last billboard fully off-camera (meets terrain.flattenStart)
     },
     terrain: {
         flattenStart: 0.43,  // hills start smoothing into a flat road
