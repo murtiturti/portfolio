@@ -8,6 +8,7 @@ const SPAWN_RATE = 10
 const PARTICLE_LIFETIME = 1.2
 const SPAWN_Y = CAR_BASE_Y - 0.5
 const PARTICLE_SPAWN_Z = 3.1
+const SPAWN_JITTER_X = 0.125
 const VEL_X_RANGE = 3
 const VEL_Y_BASE = 5
 const VEL_Y_VAR = 5
@@ -15,6 +16,10 @@ const VEL_Z_BASE = 10
 const VEL_Z_VAR = 3
 const GRAVITY = 9.8
 const EMIT_SPEED_THRESHOLD = 0.2  // fraction of maxSpeed
+const SCALE_MIN = 0.1
+const SCALE_RANGE = 0.5
+const ROT_RATE_X = 10
+const ROT_RATE_Y = 3
 
 export default class TileParticles {
     constructor(maxCount, right) {
@@ -119,9 +124,13 @@ export default class TileParticles {
                 particle.life = 0;
                 // Reset position to spawn point.
                 const tirePosition = carModel.position.x + (CAR_TIRE_X_OFFSET * this.right)
-                particle.position.set(tirePosition + (Math.random() - 0.5) * 0.125, SPAWN_Y, PARTICLE_SPAWN_Z);
-                // Make it visible.
-                particle.scale.set(Math.random() * 0.5 + 0.1, Math.random() * 0.5 + 0.1, Math.random() * 0.5 + 0.1);
+                particle.position.set(tirePosition + (Math.random() - 0.5) * SPAWN_JITTER_X, SPAWN_Y, PARTICLE_SPAWN_Z);
+                // Make it visible. Per-axis random gives slightly stretched, non-uniform tiles.
+                particle.scale.set(
+                    Math.random() * SCALE_RANGE + SCALE_MIN,
+                    Math.random() * SCALE_RANGE + SCALE_MIN,
+                    Math.random() * SCALE_RANGE + SCALE_MIN,
+                );
                 // Reset particle velocity
                 particle.velocity.set((Math.random() - 0.5) * VEL_X_RANGE, VEL_Y_BASE + Math.random() * VEL_Y_VAR, VEL_Z_BASE + Math.random() * VEL_Z_VAR)
                 // Reset particle rotation
@@ -143,8 +152,8 @@ export default class TileParticles {
                 } else {
                     // Update the particle's position based on velocity (time-based).
                     particle.position.addScaledVector(particle.velocity, deltaTime);
-                    particle.rotation.x += deltaTime * 10
-                    particle.rotation.y += deltaTime * 3
+                    particle.rotation.x += deltaTime * ROT_RATE_X
+                    particle.rotation.y += deltaTime * ROT_RATE_Y
                     // Increase z velocity here
                     particle.velocity.z += deltaTime * this.experience.state.speed
                     particle.velocity.y -= deltaTime * GRAVITY
