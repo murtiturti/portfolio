@@ -149,7 +149,7 @@ export default class SpaceStation
         const phase1Duration = fd * (t.phase2 - t.launch)
         const phase1T = Math.max(0, Math.min(1, (dist - fd * t.launch) / phase1Duration))
         const rocketPhase1Y = phase1T * phase1T * PHASE1_HEIGHT
-        // Phase 2: constant speed matching derivative at end of phase 1 (C¹-continuous)
+        // Phase 2: constant speed matching d/dt(t² · H) at t=1 → 2·H (C¹-continuous handoff)
         const phase2Speed = 2 * PHASE1_HEIGHT / phase1Duration
         const rocketPhase2Y = dist > fd * t.phase2 ? (dist - fd * t.phase2) * phase2Speed : 0
         this.rocketGroup.position.y = ROCKET_PAD_Y + rocketPhase1Y + rocketPhase2Y
@@ -165,7 +165,8 @@ export default class SpaceStation
             : PHASE1_HEIGHT + cameraPhase2 * CAMERA_SCROLL_SPEED
         this.experience.camera.cameraExtraY = dist >= fd * t.launch ? cameraExtraY : 0
 
-        // Follow horizon curve — unclamped quadratic extends beyond terrain bounds
+        // Follow horizon curve — unclamped quadratic y = -H·(z/D_z)² extends beyond terrain.
+        // Tilt (rx) is the curve's slope at this z, so the pad sits flush along the curve.
         let rx = 0
         if (baseZ < 0)
         {
