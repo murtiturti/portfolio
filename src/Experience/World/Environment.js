@@ -8,12 +8,15 @@ const SUNLIGHT = {
     shadowMapSize: 1024,
     shadowNormalBias: 0.05,
 }
+const ENV_MAP_INTENSITY = 0.4
+
 export default class Environment
 {
     constructor()
     {
         this.experience = new Experience()
         this.scene = this.experience.scene
+        this.resources = this.experience.resources
         this.debug = this.experience.debug
 
         // Debug
@@ -22,6 +25,7 @@ export default class Environment
         }
 
         this.setSunLight()
+        this.setEnvironmentMap()
     }
 
     setSunLight()
@@ -39,6 +43,33 @@ export default class Environment
         {
             this.debugFolder.add(this.sunLight, 'intensity')
                 .name('sunLightIntensity').min(0).max(10).step(0.001)
+        }
+    }
+
+    setEnvironmentMap()
+    {
+        const hdr = this.resources.items.environmentMap
+        hdr.mapping = THREE.EquirectangularReflectionMapping
+
+        // Prefilter the equirectangular HDR into a roughness-correct env map.
+        const pmrem = new THREE.PMREMGenerator(this.experience.renderer.instance)
+        const envMap = pmrem.fromEquirectangular(hdr).texture
+
+        // scene.environment auto-applies as IBL to every PBR material (e.g. the car);
+        // the custom-shader terrain ignores it. Uncomment background to show the sky.
+        this.scene.environment = envMap
+        this.scene.environmentIntensity = ENV_MAP_INTENSITY
+        // this.scene.background = envMap
+
+        hdr.dispose()
+        pmrem.dispose()
+
+        // Debug
+        if (this.debug.active)
+        {
+            this.debugFolder
+                .add(this.scene, 'environmentIntensity')
+                .name('envMapIntensity').min(0).max(4).step(0.001)
         }
     }
 }
