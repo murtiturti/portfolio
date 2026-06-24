@@ -9,6 +9,8 @@ const CARD_Z        = 0
 const GROUP_START_Y = 100
 const SCROLL_SPEED  = 1.5
 
+const VIDEO_ACTIVE_BAND = 22  // world-unit half-band around screen center where a clip plays
+
 const CARD_W_MAX      = 14   // world-unit cap on card width
 const CARD_W_VIS_FRAC = 0.82 // fraction of visible width to fill at min camera distance
 
@@ -43,8 +45,10 @@ export default class ResumeScroll
         this.scene.add(this.group)
 
         this._linkCards = []
+        this._videos = []
         this._raycaster = new THREE.Raycaster()
         this._mouse = new THREE.Vector2()
+        this._tmp = new THREE.Vector3()
 
         this._buildCards()
         this._initClickHandler()
@@ -72,11 +76,10 @@ export default class ResumeScroll
         // Projects cards first (seen last), then label (seen before its cards)
         for (const proj of resumeData.projects)
         {
-            const canvasH = proj.url ? CARD_HEIGHT_PX.projectLinked : CARD_HEIGHT_PX.project
-            const h = this._wu(canvasH)
-            const card = this._mesh(this._canvasProject(proj, canvasH), h)
-            yBottom = this._place(card, h, yBottom)
-            if (proj.url) this._linkCards.push({ mesh: card, url: proj.url })
+            const { mesh, h, videoEntry } = this._buildProjectCard(proj)
+            yBottom = this._place(mesh, h, yBottom)
+            if (proj.url) this._linkCards.push({ mesh, url: proj.url })
+            if (videoEntry) this._videos.push(videoEntry)
         }
         yBottom = this._sectionLabel('PROJECTS', '#ffaa00', yBottom)
         yBottom -= GAP
@@ -171,6 +174,82 @@ export default class ResumeScroll
         return canvas
     }
 
+    // Build a project card mesh. Plain projects use the static text canvas; a
+    // project with `media` reserves a 16:9 region inside the card and overlays a
+    // video mesh exactly on it (added as a child so it scrolls with the card).
+    _buildProjectCard(proj)
+    {
+        if (!proj.media)
+        {
+            const canvasH = proj.url ? CARD_HEIGHT_PX.projectLinked : CARD_HEIGHT_PX.project
+            const h = this._wu(canvasH)
+            return { mesh: this._mesh(this._canvasProject(proj, canvasH), h), h }
+        }
+
+        const PAD       = 40
+        const NAME_H    = 80
+        const DESC_LINE = 54
+        const DESC_ROWS = 3
+        const VID_MARGIN= 40
+        const URL_H     = proj.url ? 70 : 0
+
+        const descTop = PAD + NAME_H
+        const vidTop  = descTop + DESC_ROWS * DESC_LINE + 20
+        const vidW    = CANVAS_W - VID_MARGIN * 2
+        const vidH    = Math.round(vidW * 9 / 16)
+        const canvasH = vidTop + vidH + URL_H + PAD
+
+        const canvas = document.createElement('canvas')
+        canvas.width = CANVAS_W; canvas.height = canvasH
+        const ctx = canvas.getContext('2d')
+
+        ctx.fillStyle = '#050514'
+        ctx.fillRect(0, 0, CANVAS_W, canvasH)
+        ctx.strokeStyle = proj.url ? '#ffaa00' : '#664400'
+        ctx.lineWidth = proj.url ? 3 : 2
+        ctx.strokeRect(3, 3, CANVAS_W - 6, canvasH - 6)
+
+        ctx.textAlign = 'left'
+        ctx.fillStyle = '#ffaa00'
+        ctx.font = 'bold 58px monospace'
+        ctx.fillText(proj.name, PAD, PAD + 52)
+
+        ctx.fillStyle = '#ccccee'
+        ctx.font = '38px monospace'
+        this._wrapText(ctx, proj.description, PAD, descTop + 36, CANVAS_W - PAD * 2, DESC_LINE)
+
+        // Dark box where the video mesh sits — also the placeholder before load.
+        ctx.fillStyle = '#000000'
+        ctx.fillRect(VID_MARGIN, vidTop, vidW, vidH)
+
+        if (proj.url)
+        {
+            const display = proj.url.length > 58 ? proj.url.slice(0, 55) + '…' : proj.url
+            ctx.fillStyle = '#00ffff'
+            ctx.font = 'bold 36px monospace'
+            ctx.fillText('→ ' + display, PAD, vidTop + vidH + 48)
+        }
+
+        const h = this._wu(canvasH)
+        const mesh = this._mesh(canvas, h)
+
+        // Overlay the video plane on the reserved box. Canvas px → card-local world
+        // (origin at card center, +y up), nudged forward in z to sit on the face.
+        const ppw = this._cardW / CANVAS_W
+        const clip = new THREE.Mesh(
+            new THREE.PlaneGeometry(vidW * ppw, vidH * ppw),
+            new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.DoubleSide })
+        )
+        clip.position.set(
+            (VID_MARGIN + vidW / 2 - CANVAS_W / 2) * ppw,
+            (canvasH / 2 - (vidTop + vidH / 2)) * ppw,
+            0.02,
+        )
+        mesh.add(clip)
+
+        return { mesh, h, videoEntry: { mesh: clip, src: proj.media, video: null } }
+    }
+
     _canvasProject(proj, H)
     {
         const canvas = document.createElement('canvas')
@@ -255,6 +334,57 @@ export default class ResumeScroll
         })
     }
 
+    // ── video clips ─────────────────────────────────────────────────────────
+
+    // Lazily build the <video> + VideoTexture the first time a clip nears the
+    // screen. Nothing video-related is fetched at startup — the resume section
+    // only appears past timeline.resume.start (~55% in), so clips load on demand.
+    _ensureVideo(entry)
+    {
+        if (entry.video) return
+
+        const video = document.createElement('video')
+        video.src         = entry.src
+        video.muted       = true
+        video.loop        = true
+        video.playsInline = true
+        video.preload     = 'auto'
+        video.crossOrigin = 'anonymous'
+        entry.video = video
+
+        const tex = new THREE.VideoTexture(video)
+        tex.colorSpace = THREE.SRGBColorSpace
+        entry.mesh.material.map = tex
+        entry.mesh.material.color.set(0xffffff)  // reveal texture; placeholder was black
+        entry.mesh.material.needsUpdate = true
+    }
+
+    _updateVideos(cam)
+    {
+        // A card centered on screen sits near the camera's look-at height.
+        const eyeY = cam.position.y - 4
+
+        for (const v of this._videos)
+        {
+            const worldY = v.mesh.getWorldPosition(this._tmp).y
+            if (Math.abs(worldY - eyeY) < VIDEO_ACTIVE_BAND)
+            {
+                this._ensureVideo(v)
+                if (v.video.paused) v.video.play().catch(() => {})
+            }
+            else if (v.video && !v.video.paused)
+            {
+                v.video.pause()
+            }
+        }
+    }
+
+    _pauseVideos()
+    {
+        for (const v of this._videos)
+            if (v.video && !v.video.paused) v.video.pause()
+    }
+
     // ── update ────────────────────────────────────────────────────────────────
 
     update()
@@ -264,20 +394,25 @@ export default class ResumeScroll
 
         this.group.visible = dist >= startDist
 
-        if (this.group.visible)
+        if (!this.group.visible)
         {
-            const car = this.experience.world.car.model
-            const cam = this.experience.camera.instance
-
-            // Center on car X
-            this.group.position.x = car.position.x
-            this.group.position.y = GROUP_START_Y - (dist - startDist) * SCROLL_SPEED
-
-            // Rotate group to face camera (Y axis only, no tilt)
-            this.group.rotation.y = Math.atan2(
-                cam.position.x - this.group.position.x,
-                cam.position.z - this.group.position.z
-            )
+            this._pauseVideos()
+            return
         }
+
+        const car = this.experience.world.car.model
+        const cam = this.experience.camera.instance
+
+        // Center on car X
+        this.group.position.x = car.position.x
+        this.group.position.y = GROUP_START_Y - (dist - startDist) * SCROLL_SPEED
+
+        // Rotate group to face camera (Y axis only, no tilt)
+        this.group.rotation.y = Math.atan2(
+            cam.position.x - this.group.position.x,
+            cam.position.z - this.group.position.z
+        )
+
+        this._updateVideos(cam)
     }
 }
