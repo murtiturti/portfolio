@@ -6,8 +6,8 @@ import resumeData from '../../data/resume.json'
 const CANVAS_W      = 1400  // fixed canvas px width (text resolution)
 const GAP           = 0.8   // world-unit gap between cards
 const CARD_Z        = 0
-const GROUP_START_Y = 100
 const SCROLL_SPEED  = 1.5
+const ENTRY_LEAD    = 12   // world units the first card starts above reading height
 
 const VIDEO_ACTIVE_BAND = 22  // world-unit half-band around screen center where a clip plays
 
@@ -40,10 +40,11 @@ export default class ResumeScroll
         this._cardW = Math.min(CARD_W_MAX, visW * CARD_W_VIS_FRAC)
 
         this.group = new THREE.Group()
-        this.group.position.set(0, GROUP_START_Y, CARD_Z)
+        this.group.position.set(0, 0, CARD_Z)
         this.group.visible = false
         this.scene.add(this.group)
 
+        this._startY = null  // scroll anchor, computed on the first visible frame
         this._linkCards = []
         this._videos = []
         this._raycaster = new THREE.Raycaster()
@@ -96,6 +97,7 @@ export default class ResumeScroll
 
         // Header spawned last = seen first
         const headerH = this._wu(CARD_HEIGHT_PX.header)
+        this._firstCardY = yBottom - headerH / 2  // most-negative card center; first seen
         this._place(this._mesh(this._canvasHeader(), headerH), headerH, yBottom)
     }
 
@@ -403,9 +405,18 @@ export default class ResumeScroll
         const car = this.experience.world.car.model
         const cam = this.experience.camera.instance
 
+        // First visible frame: anchor the scroll so the first card (the header, at
+        // the most-negative local Y) starts just above reading height — regardless
+        // of how tall the stack is. Reading height matches _updateVideos' eye height.
+        if (this._startY === null)
+        {
+            const eyeY = cam.position.y - 4
+            this._startY = eyeY + ENTRY_LEAD - this._firstCardY + (dist - startDist) * SCROLL_SPEED
+        }
+
         // Center on car X
         this.group.position.x = car.position.x
-        this.group.position.y = GROUP_START_Y - (dist - startDist) * SCROLL_SPEED
+        this.group.position.y = this._startY - (dist - startDist) * SCROLL_SPEED
 
         // Rotate group to face camera (Y axis only, no tilt)
         this.group.rotation.y = Math.atan2(
