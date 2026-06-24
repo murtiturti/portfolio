@@ -1,40 +1,94 @@
 {
   "name": "Murat Diken",
-  "title": "Full Stack Developer",
+  "title": "Game Developer",
   "experiences": [
     {
-      "company": "Acme Corp",
-      "role": "Senior Frontend Engineer",
-      "period": "2022 – Present",
+      "company": "Zerosum Games",
+      "role": "Jr. Game Developer",
+      "period": "2019-2021",
       "bullets": [
-        "Built interactive 3D experiences with Three.js and WebGL",
-        "Led frontend architecture for a React + TypeScript SaaS platform",
-        "Improved build pipeline performance by 40% with Vite"
+        "Built hypercasual game prototypes",
+        "Implemented Barista Life 3D gameplay mechanics and systems"
       ]
     },
     {
-      "company": "Startup Co",
-      "role": "Full Stack Developer",
-      "period": "2019 – 2022",
+      "company": "University of Toronto",
+      "role": "MADLab Assistant",
+      "period": "2021-2022",
       "bullets": [
-        "Designed Node.js REST APIs serving 500K+ monthly users",
-        "Built real-time dashboards with WebSockets and D3.js",
-        "Migrated legacy PHP codebase to modern Node/React stack"
+        "Fixed bugs and made tools for CQ Game",
+        "Built a 3D virtual-tour platform using Unity Engine",
+        "Assisted with the MADLab 3D printing modules"
+      ]
+    },
+    {
+      "company": "University of Toronto",
+      "role": "Teaching Assistant",
+      "period": "Fall 2022",
+      "bullets": [
+        
+      ]
+    },
+    {
+      "company": "AE Labs",
+      "role": "Unity Developer",
+      "period": "November 2025 - January 2026",
+      "bullets": [
+        "Built a runner minigame for the Webpunk ecosystem",
+        "Reviewed team PRs and participated in code reviews"
+      ]
+    },
+    {
+      "company": "Wakefield Studios",
+      "role": "Software Developer",
+      "period": "May 2026 - Present",
+      "bullets": [
+        "Assisting development of Dungeon Team with bug fixes",
+        "and QoL features"
       ]
     }
   ],
   "projects": [
     {
-      "name": "Synthwave Portfolio",
-      "description": "Interactive 3D driving experience built with Three.js. Procedural terrain, particle systems, and a full narrative arc.",
+      "name": "Barista Life 3D",
+      "description": "Zerosum Games",
       "url": "",
       "media": "videos/BaristaLifeReel.webm"
     },
     {
-      "name": "Project Two",
-      "description": "A description of another notable project goes here. Replace with your real projects.",
-      "url": "https://github.com/example",
-      "media": "videos/BaristaLifeReel.webm"
+      "name": "Interval Factory",
+      "description": "Ear training solo project",
+      "url": "https://muratdiken.itch.io/intervals",
+      "media": "videos/IntervalFactoryReel.webm"
+    },
+    {
+      "name": "Her Name is Jacqueline",
+      "description": "Magical forest immersive environment project",
+      "url": "https://muratdiken.itch.io/her-name-is-jacqueline",
+      "media": "videos/JacquelineReel.webm"
+    },
+    {
+      "name": "Bike Game",
+      "description": "MVP for Serenity Forge in partnership with RealXP Lab",
+      "media": "videos/BikeGameReel.webm"
+    },
+    {
+      "name": "Fortune Guesser",
+      "description": "Game Crafters' Collective Summer Jam 2025",
+      "url": "https://zachpetty.itch.io/fortune-guesser",
+      "media": "videos/FortuneGuesserReel.webm"
+    },
+    {
+      "name": "Pawneival",
+      "description": "Toronto Game Jam 2026",
+      "url": "https://michael-wilson.itch.io/pawneival",
+      "media": "videos/PawneivalReel.webm"
+    },
+    {
+      "name": "Dungeon Team",
+      "description": "Wakefield Studios",
+      "url": "dungeonteam.com",
+      "media": "videos/DungeonTeamReel.webm"
     }
   ]
 }
