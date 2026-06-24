@@ -1,6 +1,9 @@
 import * as THREE from 'three'
 import Experience from '../Experience'
 
+export const CAR_BASE_Y = -7
+export const CAR_TIRE_X_OFFSET = 1.25
+
 export default class Car
 {
     constructor()
@@ -29,7 +32,8 @@ export default class Car
     {
         this.model = this.resource.scene
         this.model.scale.setScalar(1.0)
-        this.model.position.y = -7
+        this.model.position.y = CAR_BASE_Y
+        this.baseY = this.model.position.y
         this.scene.add(this.model)
 
         this.model.traverse((child) => {
@@ -57,17 +61,15 @@ export default class Car
 
     update()
     {
-        this.totalMoveTime = this.experience.world.terrain.distance
+        const { distance, flattenAmount } = this.experience.state
+        this.totalMoveTime = distance
+        const curveFactor = 1 - flattenAmount
 
-        // Calculate derivative at point 0.5 (center of terrain uv)
-        const v = 0.5
-        const rotationSampleDelta = 0.001 
-
+        const rotationSampleDelta = 0.001
         const rotationSample0 = (Math.sin(0.3 * 0.5 + this.totalMoveTime) * Math.sin(0.1 * 0.5 + this.totalMoveTime)) * 3.0
         const rotationSample1 = (Math.sin(0.3 * 0.5 + this.totalMoveTime + rotationSampleDelta) * Math.sin(0.1 * 0.5 + this.totalMoveTime + rotationSampleDelta)) * 3.0
         const theta = Math.atan2(rotationSample1 - rotationSample0, rotationSampleDelta)
-        this.model.rotation.y = theta * 0.1
-        this.model.position.x = 0 - (Math.sin(0.3 * 0.5 + this.totalMoveTime * 1.0) * Math.sin(0.1 * 0.5 + this.totalMoveTime * 1.0)) * 3.0
-    
+        this.model.rotation.y = theta * 0.1 * curveFactor
+        this.model.position.x = 0 - (Math.sin(0.3 * 0.5 + this.totalMoveTime) * Math.sin(0.1 * 0.5 + this.totalMoveTime)) * 3.0 * curveFactor
     }
 }

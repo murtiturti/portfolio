@@ -3,7 +3,9 @@ import Terrain from './Terrain'
 import terrainVertexShader from '../../shaders/terrain/vertex.glsl'
 import terrainFragmentShader from '../../shaders/terrain/fragment.glsl'
 
-export default class SolidTerrain extends Terrain 
+const Y_OFFSET_BELOW_TERRAIN = -0.05
+
+export default class SolidTerrain extends Terrain
 {
     constructor()
     {
@@ -34,6 +36,11 @@ export default class SolidTerrain extends Terrain
     {
         super.setMesh()
 
-        this.mesh.position.y -= 0.05
+        this.mesh.position.y += Y_OFFSET_BELOW_TERRAIN
+    }
+
+    update()
+    {
+        this.material.uniforms.uTime.value = this.experience.world.terrain.distance
     }
 }

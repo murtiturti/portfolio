@@ -1,9 +1,19 @@
 import * as THREE from 'three'
 import Experience from '../Experience.js'
+import timeline from '../timeline.js'
 import terrainVertexShader from '../../shaders/terrain/vertex.glsl'
 import terrainFragmentShader from '../../shaders/terrain/fragment.glsl'
 
-export default class Terrain 
+const ACCELERATION = 0.0095
+const DECELERATION = -0.05
+const DEFAULT_HILL_ELEVATION = 8.45
+const DEFAULT_HILL_FREQUENCY = new THREE.Vector2(0.145, 0.084)
+const DEFAULT_ROAD_ELEVATION = -8
+const DEFAULT_VALLEY_DEPTH = 27.8
+const TERRAIN_SIZE = 64
+const TERRAIN_SEGMENTS = 128
+
+export default class Terrain
 {
     constructor()
     {
@@ -12,24 +22,29 @@ export default class Terrain
         this.resources = this.experience.resources
         this.debug = this.experience.debug
         this.time = this.experience.time
-        this.uniforms = 
+        this.uniforms =
         {
-            uBigHillElevation: new THREE.Uniform(8.45),
-            uBigHillFrequency: new THREE.Uniform(new THREE.Vector2(0.145, 0.084)),
+            uBigHillElevation: new THREE.Uniform(DEFAULT_HILL_ELEVATION),
+            uBigHillFrequency: new THREE.Uniform(DEFAULT_HILL_FREQUENCY.clone()),
             uColor: new THREE.Uniform(new THREE.Color('#00ff00')),
             uTime: new THREE.Uniform(0),
-            uRoadElevation: new THREE.Uniform(-8),
-            uValleyDepth: new THREE.Uniform(27.8),
+            uRoadElevation: new THREE.Uniform(DEFAULT_ROAD_ELEVATION),
+            uValleyDepth: new THREE.Uniform(DEFAULT_VALLEY_DEPTH),
             uCarYRotation: new THREE.Uniform(0),
             uDistance: new THREE.Uniform(0),
-            uHorizonLineIntensity: new THREE.Uniform(3.0)
+            uHorizonLineIntensity: new THREE.Uniform(this.experience.state.horizonIntensity)
         }
 
         this.distance = 0
-        this.maxSpeed = 10
+        this.finishDistance = this.experience.state.finishDistance
+        this.flattenAmount = 0
+        this.baseHillElevation = this.uniforms.uBigHillElevation.value
+        this.baseRoadElevation = this.uniforms.uRoadElevation.value
+
+        this.maxSpeed = this.experience.state.maxSpeed
         this.currentSpeed = 0
-        this.acceleration = 0.0075
-        this.deceleration = -0.05
+        this.acceleration = ACCELERATION
+        this.deceleration = DECELERATION
 
         if (this.debug.active)
         {
@@ -44,7 +59,7 @@ export default class Terrain
 
     setGeometry()
     {
-        this.geometry = new THREE.PlaneGeometry(64, 64, 128, 128)
+        this.geometry = new THREE.PlaneGeometry(TERRAIN_SIZE, TERRAIN_SIZE, TERRAIN_SEGMENTS, TERRAIN_SEGMENTS)
     }
 
     setTextures()
@@ -89,6 +104,26 @@ export default class Terrain
                 .min(8)
                 .max(50)
                 .step(0.01)
+            this.debugFolder.add(this, 'finishDistance')
+                .name('Finish Distance')
+                .min(100)
+                .max(2000)
+                .step(1)
+            this.debugFolder.add(this, 'acceleration')
+                .name('Acceleration')
+                .min(0.001)
+                .max(0.05)
+                .step(0.0001)
+            this.debugFolder.add(this, 'deceleration')
+                .name('Deceleration')
+                .min(-0.2)
+                .max(-0.001)
+                .step(0.001)
+            this.debugFolder.add(this, 'maxSpeed')
+                .name('Max Speed')
+                .min(1)
+                .max(30)
+                .step(0.1)
         }
     }
 
@@ -101,19 +136,38 @@ export default class Terrain
 
     update()
     {
-        if (this.experience.moving)
+        const flatStart = this.finishDistance * timeline.terrain.flattenStart
+        const flatEnd = this.finishDistance * timeline.terrain.flattenEnd
+        const raw = Math.max(0, Math.min(1, (this.distance - flatStart) / (flatEnd - flatStart)))
+        this.flattenAmount = raw * raw * (3 - 2 * raw)
+        this.uniforms.uBigHillElevation.value = this.baseHillElevation * (1 - this.flattenAmount)
+        this.uniforms.uRoadElevation.value  = this.baseRoadElevation  * (1 - this.flattenAmount)
+
+        const { isDragging, moving } = this.experience.state
+
+        if (!isDragging && this.distance < this.finishDistance)
         {
-            this.currentSpeed += this.acceleration
+            if (this.distance >= flatEnd)
+            {
+                this.currentSpeed = moving ? this.maxSpeed : 0
+            }
+            else if (moving)
+            {
+                this.currentSpeed += this.acceleration
+            }
+            else
+            {
+                this.currentSpeed += this.deceleration
+            }
+            this.currentSpeed = Math.min(Math.max(this.currentSpeed, 0), this.maxSpeed)
+            this.distance += this.currentSpeed * this.time.delta * 0.0001
+            this.distance = Math.min(this.distance, this.finishDistance)
         }
         else
         {
-            this.currentSpeed += this.deceleration
+            this.currentSpeed = 0
         }
-        
-        this.currentSpeed = Math.min(Math.max(this.currentSpeed, 0), this.maxSpeed)
-        this.distance += this.currentSpeed * this.time.delta * 0.0001
+
         this.material.uniforms.uTime.value = this.distance
-        // this.material.uniforms.uTime.value = this.experience.totalHoldTime * 0.0005 * Math.min(this.currentSpeed, this.maxSpeed)
-        // this.material.uniforms.uCarYRotation.value = -this.experience.world.car.model.rotation.y * (180 / Math.PI)
     }
 }

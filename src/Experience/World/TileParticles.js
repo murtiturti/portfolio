@@ -1,7 +1,25 @@
 import * as THREE from 'three';
 import Experience from '../Experience';
+import { CAR_BASE_Y, CAR_TIRE_X_OFFSET } from './Car';
 import tileVertexShader from '../../shaders/tiles/vertex.glsl';
 import tileFragmentShader from '../../shaders/tiles/fragment.glsl';
+
+const SPAWN_RATE = 10
+const PARTICLE_LIFETIME = 1.2
+const SPAWN_Y = CAR_BASE_Y - 0.5
+const PARTICLE_SPAWN_Z = 3.1
+const SPAWN_JITTER_X = 0.125
+const VEL_X_RANGE = 3
+const VEL_Y_BASE = 5
+const VEL_Y_VAR = 5
+const VEL_Z_BASE = 10
+const VEL_Z_VAR = 3
+const GRAVITY = 9.8
+const EMIT_SPEED_THRESHOLD = 0.2  // fraction of maxSpeed
+const SCALE_MIN = 0.1
+const SCALE_RANGE = 0.5
+const ROT_RATE_X = 10
+const ROT_RATE_Y = 3
 
 export default class TileParticles {
     constructor(maxCount, right) {
@@ -9,10 +27,11 @@ export default class TileParticles {
         this.maxCount = maxCount;
 
         // Spawning and lifetime parameters:
-        this.spawnRate = 10;              // Number of particles to spawn per second.
+        this.spawnRate = SPAWN_RATE;             // Number of particles to spawn per second.
         this.spawnInterval = 1 / this.spawnRate; // Time interval (seconds) between spawns.
-        this.lifetime = 3;                // Lifetime (in seconds) of each particle.
+        this.lifetime = PARTICLE_LIFETIME;       // Lifetime (in seconds) of each particle.
         this.elapsedTime = 0;             // Global elapsed time tracker.
+        this.wasEmitting = false;
         this.right = right
 
         this.geometry = new THREE.PlaneGeometry(1, 1);
@@ -36,11 +55,11 @@ export default class TileParticles {
             const spawnTime = i * this.spawnInterval;
             const particle = {
                 // Define the spawn position.
-                position: new THREE.Vector3(0, -7.2, 3.1),
+                position: new THREE.Vector3(0, SPAWN_Y, PARTICLE_SPAWN_Z),
                 rotation: new THREE.Euler(0, 0, 90),
                 // Start off hidden.
                 scale: new THREE.Vector3(0, 0, 0),
-                velocity: new THREE.Vector3((Math.random() - 0.5) * 3, 5 + Math.random() * 5, 10 + Math.random() * 3),
+                velocity: new THREE.Vector3((Math.random() - 0.5) * VEL_X_RANGE, VEL_Y_BASE + Math.random() * VEL_Y_VAR, VEL_Z_BASE + Math.random() * VEL_Z_VAR),
                 life: 0,           // Time (seconds) particle has been active.
                 active: false,     // Is the particle spawned/active?
                 spawnTime: spawnTime, // When to spawn this particle.
@@ -68,8 +87,20 @@ export default class TileParticles {
         deltaTime *= 0.001;
 
 
-        // Only spawn new particles if current speed is at least half of max speed
-        const emit = this.experience.world.terrain.currentSpeed >= (this.experience.world.terrain.maxSpeed * 0.5)
+        const emit = this.experience.state.speed >= (this.experience.state.maxSpeed * EMIT_SPEED_THRESHOLD)
+
+        // On emission start, stagger the pool so particles don't all spawn at once
+        if (emit && !this.wasEmitting)
+        {
+            for (let i = 0; i < this.maxCount; i++)
+            {
+                if (!this.particles[i].active)
+                {
+                    this.particles[i].spawnTime = this.elapsedTime + i * this.spawnInterval
+                }
+            }
+        }
+        this.wasEmitting = emit
 
         if (emit)
         {
@@ -83,21 +114,25 @@ export default class TileParticles {
 
             if (!emit && !particle.active)
             {
-                particle.spawnTime += deltaTime
+                particle.spawnTime = this.elapsedTime
             }
 
             // If the particle is inactive and its scheduled spawn time has arrived, activate it.
-            if (!particle.active && this.elapsedTime >= particle.spawnTime) 
+            if (!particle.active && emit && this.elapsedTime >= particle.spawnTime) 
             {
                 particle.active = true;
                 particle.life = 0;
                 // Reset position to spawn point.
-                const tirePosition = carModel.position.x + (1.25 * this.right)
-                particle.position.set(tirePosition + (Math.random() - 0.5) * 0.125, -7.5, 3.1);
-                // Make it visible.
-                particle.scale.set(Math.random() * 0.5 + 0.1, Math.random() * 0.5 + 0.1, Math.random() * 0.5 + 0.1);
+                const tirePosition = carModel.position.x + (CAR_TIRE_X_OFFSET * this.right)
+                particle.position.set(tirePosition + (Math.random() - 0.5) * SPAWN_JITTER_X, SPAWN_Y, PARTICLE_SPAWN_Z);
+                // Make it visible. Per-axis random gives slightly stretched, non-uniform tiles.
+                particle.scale.set(
+                    Math.random() * SCALE_RANGE + SCALE_MIN,
+                    Math.random() * SCALE_RANGE + SCALE_MIN,
+                    Math.random() * SCALE_RANGE + SCALE_MIN,
+                );
                 // Reset particle velocity
-                particle.velocity.set((Math.random() - 0.5) * 3, 5 + Math.random() * 5, 10 + Math.random() * 3)
+                particle.velocity.set((Math.random() - 0.5) * VEL_X_RANGE, VEL_Y_BASE + Math.random() * VEL_Y_VAR, VEL_Z_BASE + Math.random() * VEL_Z_VAR)
                 // Reset particle rotation
                 particle.rotation.set(0, 0, 90)
             }
@@ -117,11 +152,11 @@ export default class TileParticles {
                 } else {
                     // Update the particle's position based on velocity (time-based).
                     particle.position.addScaledVector(particle.velocity, deltaTime);
-                    particle.rotation.x += deltaTime * 10
-                    particle.rotation.y += deltaTime * 3
+                    particle.rotation.x += deltaTime * ROT_RATE_X
+                    particle.rotation.y += deltaTime * ROT_RATE_Y
                     // Increase z velocity here
-                    particle.velocity.z += deltaTime * this.experience.world.terrain.currentSpeed
-                    particle.velocity.y -= deltaTime * 9.8
+                    particle.velocity.z += deltaTime * this.experience.state.speed
+                    particle.velocity.y -= deltaTime * GRAVITY
                 }
             }
 

@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { GLTFLoader } from "three/examples/jsm/Addons.js";
+import { GLTFLoader, RGBELoader } from "three/examples/jsm/Addons.js";
 import EventEmitter from "./EventEmitter";
 
 export default class Resources extends EventEmitter
@@ -26,6 +26,7 @@ export default class Resources extends EventEmitter
         this.loaders.gltfLoader = new GLTFLoader()
         this.loaders.textureLoader = new THREE.TextureLoader()
         this.loaders.cubeTextureLoader = new THREE.CubeTextureLoader()
+        this.loaders.rgbeLoader = new RGBELoader()
     }
 
     startLoading()
@@ -55,12 +56,21 @@ export default class Resources extends EventEmitter
             {
                 this.loaders.cubeTextureLoader.load(
                     source.path,
-                    (file) => 
+                    (file) =>
                     {
                         this.sourceLoaded(source, file)
-                    }   
+                    }
                 )
-            }        
+            }
+            else if (source.type === 'hdrTexture')
+            {
+                this.loaders.rgbeLoader.load(
+                    source.path,
+                    (file) => {
+                        this.sourceLoaded(source, file)
+                    }
+                )
+            }
         }
     }
 

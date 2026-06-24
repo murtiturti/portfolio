@@ -1,6 +1,9 @@
 import * as THREE from 'three'
 import Experience from '../Experience'
 
+const POSITION_Y = -4.3
+const POSITION_Z = -37
+
 export default class Background
 {
     constructor()
@@ -50,8 +53,8 @@ export default class Background
     setMesh()
     {
         this.mesh = new THREE.Mesh(this.geometry, this.material)
-        this.mesh.position.y = -4.3
-        this.mesh.position.z = -37
+        this.mesh.position.y = POSITION_Y
+        this.mesh.position.z = POSITION_Z
 
         this.experience.scene.add(this.mesh)
     }

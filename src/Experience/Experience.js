@@ -1,4 +1,11 @@
 import * as THREE from 'three'
+
+const _c1 = new THREE.Color()
+const _c2 = new THREE.Color()
+function lerpHex(a, b, t) {
+    return '#' + _c1.set(a).lerp(_c2.set(b), t).getHexString()
+}
+
 import Sizes from "./Utils/Sizes"
 import Time from "./Utils/Time"
 import Camera from './Camera'
@@ -9,6 +16,7 @@ import sources from './sources.js'
 import Debug from './Utils/Debug.js'
 import GradientTexture from './Utils/GradientTexture.js'
 import UserInput from './Utils/UserInput.js'
+import timeline from './timeline.js'
 
 let instance = null
 
@@ -35,9 +43,38 @@ export default class Experience
         this.time = new Time()
         this.userInput = new UserInput()
         this.scene = new THREE.Scene()
-        this.backgroundTexture = new GradientTexture('#ff0000', '#0000ff')
-        this.scene.background = this.backgroundTexture.gradientTexture
+        this.backgroundTexture = new GradientTexture([
+            [0.0,  '#0a0015'],  // near-black deep purple
+            [0.25, '#2b0060'],  // dark violet
+            [0.45, '#d4006e'],  // hot magenta
+            [0.6,  '#ff4500'],  // neon orange-red
+            [0.75, '#ff9900'],  // amber
+            [1.0,  '#ff9900'],  // hold amber to bottom
+        ])
+        const skyGeo = new THREE.SphereGeometry(100, 32, 16)
+        const skyMat = new THREE.MeshBasicMaterial({
+            map: this.backgroundTexture.gradientTexture,
+            side: THREE.BackSide,
+            depthWrite: false,
+            depthTest: false,
+        })
+        const skyMesh = new THREE.Mesh(skyGeo, skyMat)
+        skyMesh.renderOrder = -1
+        this.scene.add(skyMesh)
         this.resources = new Resources(sources)
+        this.state = {
+            distance:         0,
+            finishDistance:   100,
+            progress:         0,
+            speed:            0,
+            maxSpeed:         15,
+            speedT:           0,
+            flattenAmount:    0,
+            isDragging:       false,
+            moving:           false,
+            baseRoadElevation: -8,
+            horizonIntensity: 3.0,
+        }
         this.camera = new Camera()
         this.renderer = new Renderer()
         this.world = new World()
@@ -45,6 +82,11 @@ export default class Experience
         // Time-based Animation
         this.totalHoldTime = 0
         this.currentHoldTime = 0
+
+        // Sky transition state
+        this._sunsetStops = [[0,'#0a0015'],[0.25,'#2b0060'],[0.45,'#d4006e'],[0.6,'#ff4500'],[0.75,'#ff9900'],[1.0,'#ff9900']]
+        this._spaceStops  = [[0,'#000000'],[0.25,'#00001a'],[0.45,'#000033'],[0.6,'#000022'],[0.75,'#000010'],[1.0,'#000000']]
+        this._lastSpaceT  = -1
 
         // Sizes resize event
         this.sizes.on('resize', () =>
@@ -77,11 +119,46 @@ export default class Experience
         this.renderer.resize()
     }
 
-    update() 
+    update()
     {
-        this.camera.update()
+        this._updateState()
         this.world.update()
+        this.camera.update()
         this.renderer.update()
+        this._updateSky()
+    }
+
+    _updateState()
+    {
+        const s = this.state
+        s.isDragging = this.world?.progressSlider?.isDragging ?? false
+        s.moving     = this.moving ?? false
+
+        const terrain = this.world?.terrain
+        if (!terrain) return
+
+        s.distance          = terrain.distance
+        s.progress          = terrain.distance / terrain.finishDistance
+        s.speed             = terrain.currentSpeed
+        s.speedT            = terrain.currentSpeed / terrain.maxSpeed
+        s.flattenAmount     = terrain.flattenAmount
+        s.baseRoadElevation = terrain.baseRoadElevation
+        s.horizonIntensity  = terrain.uniforms.uHorizonLineIntensity.value
+    }
+
+    _updateSky()
+    {
+        const { finishDistance: fd, distance: dist } = this.state
+        if (!fd) return
+
+        const spaceT = Math.max(0, Math.min(1, (dist - fd * timeline.sky.transitionStart) / (fd * timeline.sky.transitionDuration)))
+        if (spaceT === this._lastSpaceT) return
+        this._lastSpaceT = spaceT
+
+        const lerped = this._sunsetStops.map(([pos, sc], i) =>
+            [pos, lerpHex(sc, this._spaceStops[i][1], spaceT)]
+        )
+        this.backgroundTexture.update(lerped)
     }
 
     destroy()

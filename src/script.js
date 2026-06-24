@@ -1,5 +1,11 @@
-import Experience from "./Experience/experience"
+import Experience from "./Experience/Experience"
 const experience = new Experience(document.querySelector('canvas.webgl'))
+
+if (import.meta.hot) {
+    import.meta.hot.dispose(() => {
+        experience.destroy()
+    })
+}
 
 // import * as THREE from 'three'
 // import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
