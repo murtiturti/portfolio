@@ -7,10 +7,6 @@ export default {
         links:  0.12,  // "check my profiles from the links"
         resume: 0.18,  // "stay tuned for my resume"
     },
-    billboards: {
-        start: 0.23,   // first billboard begins fading in
-        end:   0.43,   // last billboard fully off-camera (meets terrain.flattenStart)
-    },
     terrain: {
         flattenStart: 0.43,  // hills start smoothing into a flat road
         flattenEnd:   0.47,  // terrain fully flat
