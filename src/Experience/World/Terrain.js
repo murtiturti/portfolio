@@ -153,11 +153,11 @@ export default class Terrain
             }
             else if (moving)
             {
-                this.currentSpeed += this.acceleration
+                this.currentSpeed += this.acceleration * this.time.delta
             }
             else
             {
-                this.currentSpeed += this.deceleration
+                this.currentSpeed += this.deceleration * this.time.delta
             }
             this.currentSpeed = Math.min(Math.max(this.currentSpeed, 0), this.maxSpeed)
             this.distance += this.currentSpeed * this.time.delta * 0.0001
